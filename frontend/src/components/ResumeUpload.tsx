@@ -53,11 +53,11 @@ export default function ResumeUpload({ onAnalysisComplete }: ResumeUploadProps) 
     };
 
     return (
-        <div className="w-full max-w-3xl mx-auto space-y-6">
+        <div className="w-full max-w-3xl mx-auto flex flex-col gap-16">
             <div
-                className={`relative group h-72 rounded-[45px] border-4 border-dashed transition-all duration-500 overflow-hidden flex flex-col items-center justify-center bg-white ${dragActive
-                    ? "border-indigo-500 bg-indigo-50/30 scale-[1.02]"
-                    : "border-slate-100 hover:border-indigo-200 hover:bg-slate-50/50"
+                className={`relative group h-72 rounded-3xl border border-white/30 transition-all duration-500 overflow-hidden flex flex-col items-center justify-center bg-gradient-to-br from-white/30 to-white/10 backdrop-blur-3xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] ${dragActive
+                    ? "border-indigo-400 bg-indigo-50/40 scale-[1.02] shadow-indigo-500/20"
+                    : "hover:border-white/50 hover:bg-gradient-to-br hover:from-white/40 hover:to-white/20 hover:shadow-[0_20px_40px_rgba(79,70,229,0.15)]"
                     }`}
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
@@ -72,7 +72,7 @@ export default function ResumeUpload({ onAnalysisComplete }: ResumeUploadProps) 
                 />
 
                 <div className="flex flex-col items-center gap-10 pointer-events-none">
-                    <div className={`w-24 h-24 rounded-[32px] flex items-center justify-center transition-all duration-500 ${file ? "bg-green-500 text-white rotate-[360deg] scale-110" : "bg-indigo-50 text-indigo-500 group-hover:scale-110"
+                    <div className={`w-24 h-24 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-sm border border-white/50 ${file ? "bg-green-500 text-white rotate-[360deg] scale-110 border-green-400" : "bg-white/60 text-indigo-600 group-hover:scale-110 group-hover:bg-white group-hover:shadow-md"
                         }`}>
                         {file ? <CheckCircle2 className="w-12 h-12" /> : <Upload className="w-12 h-12" />}
                     </div>
@@ -97,28 +97,26 @@ export default function ResumeUpload({ onAnalysisComplete }: ResumeUploadProps) 
                 )}
             </div>
 
-            {file && (
-                <button
-                    onClick={handleUpload}
-                    disabled={isUploading}
-                    className="w-full group relative overflow-hidden h-20 rounded-[30px] bg-slate-900 text-white font-black text-xl hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-indigo-100 flex items-center justify-center gap-3"
-                >
-                    {isUploading ? (
-                        <>
-                            <Loader2 className="w-7 h-7 animate-spin text-indigo-400" />
-                            <span className="animate-pulse">Analyzing Experience...</span>
-                        </>
-                    ) : (
-                        <>
-                            <Sparkles className="w-6 h-6 text-indigo-400 group-hover:rotate-12 transition-transform" />
-                            면접 질문지 생성하기
-                        </>
-                    )}
+            <button
+                onClick={handleUpload}
+                disabled={isUploading}
+                className="w-full group relative overflow-hidden h-20 rounded-[20px] bg-slate-900 border border-slate-800 text-white font-black text-xl hover:-translate-y-1 active:scale-95 transition-all duration-500 shadow-[0_20px_40px_rgba(15,23,42,0.2)] hover:shadow-[0_20px_50px_rgba(79,70,229,0.3)] flex items-center justify-center gap-3"
+            >
+                {isUploading ? (
+                    <>
+                        <Loader2 className="w-7 h-7 animate-spin text-indigo-400" />
+                        <span className="animate-pulse">Analyzing Experience...</span>
+                    </>
+                ) : (
+                    <>
+                        <Sparkles className="w-6 h-6 text-indigo-400 group-hover:rotate-12 transition-transform" />
+                        면접 질문지 생성하기
+                    </>
+                )}
 
-                    {/* Subtle Glow Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                </button>
-            )}
+                {/* Subtle Glow Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+            </button>
         </div>
     );
 }
