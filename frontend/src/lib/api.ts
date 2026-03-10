@@ -85,3 +85,19 @@ export const transcribeAudio = async (audioBlob: Blob) => {
 };
 
 export default api;
+// 취업 캘린더 관련 API
+// 취업 캘린더 관련 API
+export const getJobs = async () => {
+    const response = await api.get('/api/v1/jobs');
+    return response.data;
+};
+
+export const addJob = async (jobData: { company: string; position: string; deadline: string; notes?: string }) => {
+    const response = await api.post('/api/v1/jobs', jobData);
+    return response.data;
+};
+
+export const deleteJob = async (appId: string) => {
+    const response = await api.delete(`/api/v1/jobs/${appId}`);
+    return response.data;
+};

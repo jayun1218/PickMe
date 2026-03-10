@@ -37,6 +37,12 @@ class ResumeStarCoachRequest(BaseModel):
     resume_text: str
     experience_text: str
 
+class JobApplication(BaseModel):
+    company: str
+    position: str
+    deadline: str
+    notes: Optional[str] = None
+
 # CORS 설정
 app.add_middleware(
     CORSMiddleware,
@@ -201,6 +207,39 @@ async def get_interview_history(limit: int = 10):
         return history
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# 취업 캘린더 지원 공고 관련 API
+@app.post("/api/v1/jobs")
+async def add_job_application(job: JobApplication):
+    try:
+        from database import db_manager
+        result = await db_manager.save_job_application(job.dict())
+        if not result:
+            raise HTTPException(status_code=500, detail="저장에 실패했습니다.")
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/v1/jobs")
+async def get_job_applications():
+    try:
+        from database import db_manager
+        result = await db_manager.get_job_applications()
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/v1/jobs/{app_id}")
+async def delete_job_application(app_id: str):
+    try:
+        from database import db_manager
+        success = await db_manager.delete_job_application(app_id)
+        if not success:
+            raise HTTPException(status_code=500, detail="삭제에 실패했습니다.")
+        return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/api/v1/interview/stt")
 async def transcribe_voice(file: UploadFile = File(...)):
     try:

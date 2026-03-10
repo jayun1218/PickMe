@@ -69,4 +69,37 @@ class DatabaseManager:
             print(f"이력 조회 중 오류 발생: {e}")
             return []
 
+    async def save_job_application(self, data: dict):
+        """새로운 지원 공고 정보를 DB에 저장합니다."""
+        if not self.client:
+            return None
+        try:
+            res = self.client.table("job_applications").insert(data).execute()
+            return res.data[0]
+        except Exception as e:
+            print(f"공고 저장 중 오류 발생: {e}")
+            return None
+
+    async def get_job_applications(self):
+        """등록된すべての 지원 공고 정보를 가져옵니다."""
+        if not self.client:
+            return []
+        try:
+            res = self.client.table("job_applications").select("*").order("deadline", descending=False).execute()
+            return res.data
+        except Exception as e:
+            print(f"공고 조회 중 오류 발생: {e}")
+            return []
+
+    async def delete_job_application(self, app_id: str):
+        """특정 지원 공고 정보를 삭제합니다."""
+        if not self.client:
+            return False
+        try:
+            self.client.table("job_applications").delete().eq("id", app_id).execute()
+            return True
+        except Exception as e:
+            print(f"공고 삭제 중 오류 발생: {e}")
+            return False
+
 db_manager = DatabaseManager()

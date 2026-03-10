@@ -11,7 +11,10 @@ import InterviewChat from "@/components/InterviewChat";
 import FeedbackReport from "@/components/FeedbackReport";
 import ResumeCoachResult from "@/components/ResumeCoachResult";
 import Dashboard from "@/components/Dashboard";
+import JobCalendar from "@/components/Calendar"; // Added JobCalendar import
 import { analyzeInterview } from "@/lib/api";
+
+type ViewMode = "simple" | "combined" | "coaching" | "dashboard" | "calendar"; // Updated ViewMode type
 
 export default function HomePage() {
     const [analysisResult, setAnalysisResult] = useState<any>(null);
@@ -19,7 +22,7 @@ export default function HomePage() {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [feedbackData, setFeedbackData] = useState<any>(null);
     const [scrolled, setScrolled] = useState(false);
-    const [mode, setMode] = useState<"simple" | "combined" | "coaching" | "dashboard">("simple");
+    const [mode, setMode] = useState<ViewMode>("simple"); // Using ViewMode type
     const [isPressureMode, setIsPressureMode] = useState(false);
 
     useEffect(() => {
@@ -94,12 +97,17 @@ export default function HomePage() {
                             Dashboard
                         </button>
                         <button
+                            onClick={() => setMode("calendar")}
+                            className={`hover:text-indigo-600 transition-colors ${mode === "calendar" ? "text-indigo-600" : ""}`}
+                        >
+                            Calendar
+                        </button>
+                        <button
                             onClick={() => setMode("coaching")}
                             className={`hover:text-indigo-600 transition-colors flex items-center gap-2 ${mode === "coaching" ? "text-indigo-600" : ""}`}
                         >
                             Resume Coaching
                         </button>
-                        <a href="#" className="hover:text-indigo-600 transition-colors">Success Stories</a>
                     </div>
                 </div>
             </nav>
@@ -158,9 +166,9 @@ export default function HomePage() {
                                 </div>
 
                                 <h1 className="text-[3.5rem] md:text-7xl lg:text-[5.5rem] font-[900] tracking-tighter text-slate-900 leading-[1.1] text-center w-full max-w-5xl">
-                                    {mode === "coaching" ? "합격률을 높이는" : mode === "dashboard" ? "당신의 성장을 기록하는" : "합격의 문을 여는"} <br />
+                                    {mode === "coaching" ? "합격률을 높이는" : mode === "dashboard" ? "당신의 성장을 기록하는" : mode === "calendar" ? "성공적인 취업을 돕는" : "합격의 문을 여는"} <br />
                                     <span className="text-gradient relative inline-block">
-                                        {mode === "coaching" ? "매력적인 자소서" : mode === "dashboard" ? "스마트 대시보드" : "가장 완벽한 전략"}
+                                        {mode === "coaching" ? "매력적인 자소서" : mode === "dashboard" ? "스마트 대시보드" : mode === "calendar" ? "취업 캘린더" : "가장 완벽한 전략"}
                                         <Sparkles className="absolute -top-4 -right-8 w-6 h-6 text-indigo-400 animate-pulse" />
                                     </span>
                                 </h1>
@@ -170,12 +178,14 @@ export default function HomePage() {
                                         ? <>당신의 경험을 STAR 기법으로 정교하게 분석하여 <br /> 임팩트 있는 자기소개서 초안을 완성해 드립니다.</>
                                         : mode === "dashboard"
                                             ? <>지금까지의 면접 여정을 분석하여 <br /> 더 완벽한 합격 전략을 제시합니다.</>
-                                            : <>당신의 이력서와 채용 공고를 정밀 매칭하여 <br /> 합격을 위한 초정밀 면접 질문을 설계해 드립니다.</>
+                                            : mode === "calendar"
+                                                ? <>기업별 공고 마감 기간을 한눈에 확인하고 <br /> 체계적으로 지원 일정을 관리하여 기회를 놓치지 마세요.</>
+                                                : <>당신의 이력서와 채용 공고를 정밀 매칭하여 <br /> 합격을 위한 초정밀 면접 질문을 설계해 드립니다.</>
                                     }
                                 </p>
                             </div>
 
-                            {mode !== "coaching" && mode !== "dashboard" && (
+                            {mode !== "coaching" && mode !== "dashboard" && mode !== "calendar" && ( // Exclude calendar mode
                                 <div className="flex flex-col items-center gap-6">
                                     {/* Mode Switching Tabs */}
                                     <div className="flex bg-slate-200/50 p-1.5 rounded-[28px] border border-slate-200 backdrop-blur-md shadow-inner">
@@ -211,14 +221,16 @@ export default function HomePage() {
                                     <CombinedUpload onAnalysisComplete={handleAnalysisComplete} />
                                 ) : mode === "coaching" ? (
                                     <ResumeCoach onAnalysisComplete={handleAnalysisComplete} />
-                                ) : (
+                                ) : mode === "dashboard" ? (
                                     <Dashboard />
-                                )}
+                                ) : mode === "calendar" ? ( // Added calendar mode rendering
+                                    <JobCalendar />
+                                ) : null}
                             </div>
                             <div className="h-[80px] w-full" />
 
                             {/* Feature Grid */}
-                            {mode !== "dashboard" && (
+                            {mode !== "dashboard" && mode !== "calendar" && ( // Exclude calendar mode
                                 <div className="grid md:grid-cols-3 gap-16 w-full max-w-6xl border-t border-slate-100/50 pt-20">
                                     <FeatureItem
                                         icon={<FileText className="w-8 h-8" />}

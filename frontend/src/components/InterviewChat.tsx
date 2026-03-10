@@ -22,7 +22,16 @@ export default function InterviewChat({ initialQuestion, onFinish, isPressureMod
     ]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [currentCompetency, setCurrentCompetency] = useState<string | null>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
+
+    const competencyMap: Record<string, string> = {
+        communication: '소통력 검증 중',
+        problem_solving: '문제해결력 검증 중',
+        technical_skill: '기술 역량 검증 중',
+        passion: '열정 및 태도 검증 중',
+        cooperation: '협업 능력 검증 중'
+    };
 
     useEffect(() => {
         if (scrollRef.current) {
@@ -46,6 +55,10 @@ export default function InterviewChat({ initialQuestion, onFinish, isPressureMod
                 role: 'assistant',
                 content: data.content
             };
+
+            if (data.focus_competency) {
+                setCurrentCompetency(data.focus_competency);
+            }
 
             setMessages(prev => [...prev, aiMessage]);
 
@@ -76,10 +89,17 @@ export default function InterviewChat({ initialQuestion, onFinish, isPressureMod
                         <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-4 border-white rounded-full"></div>
                     </div>
                     <div>
-                        <h3 className="font-black text-xl text-slate-900 tracking-tight">면접관 피키</h3>
+                        <div className="flex items-center gap-3">
+                            <h3 className="font-black text-xl text-slate-900 tracking-tight">면접관 피키</h3>
+                            {currentCompetency && (
+                                <div className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-tighter rounded-lg border border-indigo-100 animate-in zoom-in duration-300">
+                                    {competencyMap[currentCompetency] || currentCompetency}
+                                </div>
+                            )}
+                        </div>
                         <div className="flex items-center gap-2">
                             <Sparkles className="w-3 h-3 text-indigo-500 animate-pulse" />
-                            <p className="text-[11px] text-indigo-500 font-black uppercase tracking-[0.2em]">Picky AI v2.0</p>
+                            <p className="text-[11px] text-indigo-500 font-black uppercase tracking-[0.2em]">Deep Interaction Mode</p>
                         </div>
                     </div>
                 </div>
@@ -111,9 +131,12 @@ export default function InterviewChat({ initialQuestion, onFinish, isPressureMod
                         </div>
 
                         <div className={`max-w-[75%] p-6 rounded-3xl text-base leading-relaxed font-medium shadow-sm border ${m.role === 'assistant'
-                            ? 'bg-white border-slate-50 text-slate-700 rounded-tl-none'
+                            ? 'bg-white border-slate-50 text-slate-700 rounded-tl-none relative overflow-hidden group'
                             : 'bg-slate-900 border-slate-900 text-white rounded-tr-none'
                             }`}>
+                            {m.role === 'assistant' && idx === messages.length - 1 && (
+                                <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500 animate-pulse"></div>
+                            )}
                             {m.content}
                         </div>
                     </div>
