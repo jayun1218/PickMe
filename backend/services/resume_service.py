@@ -30,34 +30,59 @@ class ResumeService:
 
     async def generate_interview_questions(self, resume_text: str):
         """이력서 텍스트를 기반으로 면접 질문을 생성합니다."""
+        return await self.generate_combined_analysis(resume_text, None)
+
+    async def generate_combined_analysis(self, resume_text: str, notice_text: str = None):
+        """이력서와 채용 공고(옵션)를 기반으로 최적화된 면접 질문을 생성합니다."""
         if not resume_text:
             return []
 
         if not self.client:
-            # API 키가 없는 경우 개발용 Mock 응답 반환 (Optional)
             return [
                 {"id": 1, "category": "안내", "question": "OPENAI_API_KEY가 설정되지 않았습니다. .env 파일을 확인해주세요."},
                 {"id": 2, "category": "역량", "question": "Mock 질문: 본인의 핵심 강점은 무엇인가요?"}
             ]
 
-        system_prompt = """
-        당신은 전문적인 기술 면접관입니다. 제공된 이력서 내용을 분석하여 지원자의 역량을 파악하고,
-        실무 역량(Hard Skills)과 협업 능력(Soft Skills)을 검증할 수 있는 예상 면접 질문 20개를 생성해주세요.
-        응답은 반드시 아래의 JSON 형식으로만 해주세요:
-        {
-            "questions": [
-                {"id": 1, "category": "역량/경험", "question": "질문 내용"},
-                ...
-            ]
-        }
-        """
+        if notice_text:
+            system_prompt = """
+            당신은 기업의 채용 전문가이자 수석 면접관입니다. 
+            제공된 [채용 공고]의 직무 요구사항과 [지원자 이력서]의 경험을 대조하여 가장 날카로운 면접 질문 20개를 생성해주세요.
+            
+            분석 지침:
+            1. 공고에서 요구하는 '필수 역량'이 이력서에 있는지 검증하는 질문을 우선순위로 둡니다.
+            2. 지원자의 경험 중 공고의 '우대 사항'과 일치하는 부분을 깊이 있게 파고드세요.
+            3. 공고의 직무 성격(예: 공기업의 공공성, 스타트업의 도전정신 등)을 반영한 태도 질문을 포함하세요.
+            4. 질문은 구체적이어야 하며, 실무 중심이어야 합니다.
+
+            응답은 반드시 아래의 JSON 형식으로만 해주세요:
+            {
+                "questions": [
+                    {"id": 1, "category": "직무적합성/역량/경험", "question": "질문 내용"},
+                    ...
+                ]
+            }
+            """
+            user_content = f"[채용 공고 내용]:\n{notice_text}\n\n[지원자 이력서 내용]:\n{resume_text}"
+        else:
+            system_prompt = """
+            당신은 전문적인 기술 면접관입니다. 제공된 이력서 내용을 분석하여 지원자의 역량을 파악하고,
+            실무 역량(Hard Skills)과 협업 능력(Soft Skills)을 검증할 수 있는 예상 면접 질문 20개를 생성해주세요.
+            응답은 반드시 아래의 JSON 형식으로만 해주세요:
+            {
+                "questions": [
+                    {"id": 1, "category": "역량/경험", "question": "질문 내용"},
+                    ...
+                ]
+            }
+            """
+            user_content = f"지원자 이력서 내용:\n{resume_text}"
 
         try:
             response = self.client.chat.completions.create(
                 model="gpt-4o",
                 messages=[
                     {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": f"이력서 내용:\n{resume_text}"}
+                    {"role": "user", "content": user_content}
                 ],
                 response_format={"type": "json_object"}
             )

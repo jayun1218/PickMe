@@ -16,6 +16,19 @@ export const analyzeResume = async (file: File) => {
     return response.data;
 };
 
+export const analyzeCombined = async (resume: File, notice: File) => {
+    const formData = new FormData();
+    formData.append('resume', resume);
+    formData.append('notice', notice);
+
+    const response = await api.post('/api/v1/analyze/combined', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+    return response.data;
+};
+
 export const chatWithInterviewer = async (messages: { role: string; content: string }[]) => {
     const response = await api.post('/api/v1/interview/chat', { messages });
     return response.data;

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Mic, FileText, BarChart3, Sparkles, ArrowRight, ChevronRight } from "lucide-react";
 import ResumeUpload from "@/components/ResumeUpload";
+import CombinedUpload from "@/components/CombinedUpload";
 import QuestionList from "@/components/QuestionList";
 import InterviewChat from "@/components/InterviewChat";
 import FeedbackReport from "@/components/FeedbackReport";
@@ -14,6 +15,7 @@ export default function HomePage() {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [feedbackData, setFeedbackData] = useState<any>(null);
     const [scrolled, setScrolled] = useState(false);
+    const [mode, setMode] = useState<"simple" | "combined">("simple");
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -119,7 +121,7 @@ export default function HomePage() {
                             />
                         </div>
                     ) : !analysisResult ? (
-                        <section className="w-full text-center space-y-32 animate-in fade-in slide-in-from-bottom-8 duration-1000 flex flex-col items-center">
+                        <section className="w-full text-center space-y-24 animate-in fade-in slide-in-from-bottom-8 duration-1000 flex flex-col items-center">
                             <div className="space-y-10 flex flex-col items-center w-full">
                                 <div className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-white border border-indigo-50 shadow-sm text-indigo-600 text-[11px] font-black tracking-[0.2em] uppercase mx-auto">
                                     <span className="relative flex h-2.5 w-2.5">
@@ -135,18 +137,46 @@ export default function HomePage() {
                                 </h1>
 
                                 <p className="text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed font-medium text-center">
-                                    당신의 이력서 속에 숨겨진 최고의 강점을 찾아보세요. <br />
-                                    AI가 실제 면접관의 시선으로 질문을 설계하고 학습을 돕습니다.
+                                    당신의 이력서와 채용 공고를 정밀 매칭하여 <br />
+                                    합격을 위한 초정밀 면접 질문을 설계해 드립니다.
                                 </p>
                             </div>
 
-                            <div className="relative py-32 w-full flex justify-center">
-                                <div className="absolute inset-0 bg-gradient-to-b from-indigo-50/0 via-indigo-50/30 to-indigo-50/0 -z-10 blur-3xl"></div>
-                                <ResumeUpload onAnalysisComplete={handleAnalysisComplete} />
+                            <div className="flex flex-col items-center gap-6">
+                                {/* Mode Switching Tabs */}
+                                <div className="flex bg-slate-200/50 p-1.5 rounded-[28px] border border-slate-200 backdrop-blur-md shadow-inner">
+                                    <button
+                                        onClick={() => setMode("simple")}
+                                        className={`relative px-10 py-4 rounded-[22px] text-[13px] font-black uppercase tracking-widest transition-all duration-300 ${mode === "simple"
+                                            ? "bg-white text-indigo-600 shadow-2xl shadow-indigo-200/50 scale-100"
+                                            : "text-slate-400 hover:text-slate-600 scale-95"
+                                            }`}
+                                    >
+                                        이력서 단독 분석
+                                    </button>
+                                    <button
+                                        onClick={() => setMode("combined")}
+                                        className={`relative px-10 py-4 rounded-[22px] text-[13px] font-black uppercase tracking-widest transition-all duration-300 ${mode === "combined"
+                                            ? "bg-white text-indigo-600 shadow-2xl shadow-indigo-200/50 scale-100"
+                                            : "text-slate-400 hover:text-slate-600 scale-95"
+                                            }`}
+                                    >
+                                        기업 맞춤형 매칭
+                                    </button>
+                                </div>
+                                <p className="text-slate-400 text-xs font-bold uppercase tracking-tighter">분석 모드를 선택하여 시작하세요</p>
+                            </div>
+
+                            <div className="py-16 w-full flex justify-center">
+                                {mode === "simple" ? (
+                                    <ResumeUpload onAnalysisComplete={handleAnalysisComplete} />
+                                ) : (
+                                    <CombinedUpload onAnalysisComplete={handleAnalysisComplete} />
+                                )}
                             </div>
 
                             {/* Feature Grid */}
-                            <div className="grid md:grid-cols-3 gap-12 pt-56 w-full max-w-6xl">
+                            <div className="grid md:grid-cols-3 gap-12 pt-40 w-full max-w-6xl">
                                 <FeatureItem
                                     icon={<FileText className="w-6 h-6" />}
                                     title="Deep Analysis"
@@ -178,9 +208,15 @@ export default function HomePage() {
 
                             <header className="mb-16">
                                 <h2 className="text-4xl font-[900] text-slate-900 mb-4 tracking-tight">AI가 설계한 <br />맞춤 면접 질문 리스트</h2>
-                                <div className="flex items-center gap-3">
+                                <div className="flex flex-wrap items-center gap-3">
                                     <div className="px-3 py-1 bg-slate-900 text-white rounded-lg text-[11px] font-bold">PDF Found</div>
-                                    <p className="text-slate-500 font-medium">"{analysisResult.filename}" 분석 완료</p>
+                                    <p className="text-slate-500 font-medium">이력서: "{analysisResult.filename}"</p>
+                                    {analysisResult.notice_filename && (
+                                        <>
+                                            <div className="w-1.5 h-1.5 rounded-full bg-slate-200"></div>
+                                            <p className="text-slate-500 font-medium">채용공고: "{analysisResult.notice_filename}"</p>
+                                        </>
+                                    )}
                                 </div>
                             </header>
 
