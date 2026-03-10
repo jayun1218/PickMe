@@ -62,7 +62,7 @@ export default function HomePage() {
             {/* Premium Floating Navigation */}
             <nav className={`fixed top-0 left-0 w-full z-[100] transition-all duration-500 px-6 pt-6 flex justify-center ${scrolled ? "pt-4" : "pt-8"
                 }`}>
-                <div className="w-full max-w-5xl glass-effect rounded-[28px] px-8 h-20 flex items-center justify-between border border-white/60 shadow-xl shadow-indigo-900/5 relative overflow-hidden">
+                <div className="w-full max-w-[1400px] glass-effect rounded-[28px] pl-20 pr-12 h-20 flex items-center justify-between border border-white/60 shadow-xl shadow-indigo-900/5 relative overflow-hidden">
                     <div className="absolute inset-0 bg-white/40 backdrop-blur-xl -z-10"></div>
                     <div
                         onClick={() => {
@@ -71,6 +71,7 @@ export default function HomePage() {
                             setFeedbackData(null);
                             window.scrollTo({ top: 0, behavior: "smooth" });
                         }}
+                        style={{ marginLeft: '40px' }}
                         className="flex items-center gap-3 group cursor-pointer"
                     >
                         <div className="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200 group-hover:rotate-6 transition-transform">
@@ -81,15 +82,14 @@ export default function HomePage() {
                         </span>
                     </div>
 
-                    <div className="hidden md:flex items-center gap-10 text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                    <div className="hidden md:flex items-center gap-14 text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">
                         <Link href="/" className="hover:text-indigo-600 transition-colors">Platform</Link>
                         <Link href="/dashboard" className="hover:text-indigo-600 transition-colors">Dashboard</Link>
                         <a href="#" className="hover:text-indigo-600 transition-colors">Success Stories</a>
                     </div>
 
-                    <button className="bg-slate-900 text-white px-7 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 hover:scale-105 transition-all shadow-xl shadow-slate-200">
-                        Get Started
-                    </button>
+                    {/* Spacer to keep menu centered after removing Get Started button */}
+                    <div className="hidden md:block w-[130px]"></div>
                 </div>
             </nav>
 
