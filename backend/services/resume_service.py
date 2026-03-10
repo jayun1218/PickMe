@@ -128,3 +128,55 @@ class ResumeService:
             return json.loads(response.choices[0].message.content)
         except Exception as e:
             raise Exception(f"첨삭 생성 중 오류 발생: {str(e)}")
+    async def generate_star_coaching(self, resume_text: str, experience_text: str):
+        """사용자의 파편화된 경험을 STAR 기법으로 구조화하고 자소서용 초안을 생성합니다."""
+        if not self.client:
+            return {
+                "star_structure": {
+                    "situation": "API 키가 설정되지 않았습니다.",
+                    "task": "설정 확인이 필요합니다.",
+                    "action": "행동 내용",
+                    "result": "결과 내용"
+                },
+                "improved_draft": "API 키를 설정하면 전문적인 초안이 생성됩니다.",
+                "key_insight": "핵심 역량 요약"
+            }
+
+        system_prompt = """
+        당신은 지원자의 경험을 매력적으로 다듬어주는 전문 자소서 에디터이자 커리어 코치입니다.
+        사용자가 입력한 [파편화된 경험]을 바탕으로, 지원자의 [이력서] 배경 정보를 참고하여 
+        최적화된 STAR(Situation, Task, Action, Result) 구조로 정리하고, 
+        실제 자기소개서에 바로 사용할 수 있는 전문적이고 설득력 있는 초안을 작성해주세요.
+
+        작성 지침:
+        1. Situation: 당시의 구체적인 상황과 배경을 설명하세요.
+        2. Task: 해결해야 했던 문제나 목표를 명확히 정의하세요.
+        3. Action: 지원자가 직접 수행한 구체적인 행동과 노력을 강조하세요.
+        4. Result: 정성적/정량적 성과를 명확히 제시하세요.
+        5. Improved Draft: 소제목을 포함하여 약 500자 내외의 완성도 높은 문장을 작성하세요.
+
+        응답 형식은 반드시 아래의 JSON 구조를 따르세요:
+        {
+            "star_structure": {
+                "situation": "내용",
+                "task": "내용",
+                "action": "내용",
+                "result": "내용"
+            },
+            "improved_draft": "소제목을 포함한 전체 문장",
+            "key_insight": "이 경험에서 강조되는 핵심 역량 1줄 요약"
+        }
+        """
+
+        try:
+            response = self.client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": f"[이력서 배경]:\n{resume_text}\n\n[파편화된 경험]:\n{experience_text}"}
+                ],
+                response_format={"type": "json_object"}
+            )
+            return json.loads(response.choices[0].message.content)
+        except Exception as e:
+            raise Exception(f"STAR 코칭 생성 중 오류 발생: {str(e)}")

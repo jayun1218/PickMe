@@ -37,28 +37,44 @@ export default function DashboardPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[#F8F9FF] via-[#F0F2FF] to-[#E8EBFF] py-20 px-6 relative overflow-hidden">
-            {/* Background Decorative Elements */}
-            <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-indigo-200/30 rounded-full blur-[120px] animate-pulse"></div>
-            <div className="absolute bottom-[-10%] left-[-10%] w-[800px] h-[800px] bg-purple-200/30 rounded-full blur-[150px]"></div>
-            <div className="absolute top-[20%] left-[5%] w-32 h-32 bg-white/40 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-[30%] right-[5%] w-48 h-48 bg-indigo-100/40 rounded-full blur-3xl"></div>
+        <div className="min-h-screen bg-white py-20 px-6 relative overflow-hidden">
+            {/* Premium Background Elements */}
+            <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+                <div className="absolute top-[-10%] -left-[10%] w-[70vw] h-[70vw] rounded-full bg-indigo-50/50 blur-[120px] animate-float-slow"></div>
+                <div className="absolute top-[20%] -right-[15%] w-[45vw] h-[45vw] rounded-full bg-purple-50/40 blur-[130px] mix-blend-multiply animate-float-slow" style={{ animationDelay: '2s' }}></div>
+                <div className="absolute -bottom-[20%] left-[10%] w-[60vw] h-[50vw] rounded-full bg-pink-50/30 blur-[150px] mix-blend-multiply animate-float-slow" style={{ animationDelay: '4s' }}></div>
+            </div>
 
-            <div className="w-full max-w-6xl mx-auto space-y-16 relative z-10">
-                <header className="flex flex-col items-center text-center gap-8 animate-in fade-in slide-in-from-top-12 duration-1000">
-                    <Link href="/" className="group w-fit flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/40 backdrop-blur-md border border-white/50 text-indigo-600 font-[1000] text-xs uppercase tracking-[0.2em] hover:bg-white/70 hover:scale-105 transition-all shadow-sm">
-                        <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-                        홈으로 돌아가기
-                    </Link>
+            <div className="w-full max-w-6xl mx-auto space-y-24 relative z-10">
+                <header className="flex flex-col items-center text-center space-y-12 animate-in fade-in slide-in-from-top-12 duration-1000">
+                    <div className="space-y-12 flex flex-col items-center w-full relative">
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-gradient-to-r from-indigo-500/5 via-purple-500/5 to-pink-500/5 blur-[80px] -z-10 rounded-full"></div>
 
-                    <div className="space-y-4">
-                        <div className="flex flex-col items-center gap-4">
-                            <div className="w-16 h-16 bg-slate-900 rounded-[22px] flex items-center justify-center text-white shadow-2xl shadow-indigo-100 rotate-6 hover:rotate-0 transition-transform duration-500">
-                                <Sparkles className="w-8 h-8" />
-                            </div>
-                            <h1 className="text-6xl font-[1000] text-slate-900 tracking-tighter italic">면접 분석 히스토리</h1>
+                        <div className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-white/80 backdrop-blur-md border border-indigo-100 shadow-xl shadow-indigo-900/5 text-indigo-600 text-[11px] font-black tracking-[0.2em] uppercase mx-auto hover:scale-105 transition-transform cursor-default">
+                            <span className="relative flex h-2.5 w-2.5">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-600 shadow-[0_0_10px_rgba(79,70,229,0.5)]"></span>
+                            </span>
+                            Interview Intelligence Dashboard
                         </div>
-                        <p className="text-slate-500 font-bold text-xl tracking-tight opacity-80">당신의 성장은 이미 시작되었습니다</p>
+
+                        <h1 className="text-[3.5rem] md:text-7xl lg:text-7xl font-[900] tracking-tighter text-slate-900 leading-[1.1] text-center w-full max-w-5xl">
+                            당신의 성장을 기록하는 <br />
+                            <span className="text-gradient relative inline-block">
+                                스마트 대시보드
+                                <Sparkles className="absolute -top-6 -right-10 w-8 h-8 text-indigo-400 animate-pulse" />
+                            </span>
+                        </h1>
+
+                        <p className="text-xl md:text-2xl text-slate-500 max-w-2xl mx-auto leading-relaxed font-medium text-center tracking-tight">
+                            지금까지의 면접 여정을 분석하여 <br />
+                            더 완벽한 합격 전략을 제시합니다.
+                        </p>
+
+                        <Link href="/" className="group w-fit flex items-center gap-2 px-8 py-4 rounded-2xl bg-slate-900 border border-slate-800 text-white font-bold text-sm tracking-tight hover:bg-slate-800 hover:scale-105 transition-all shadow-2xl">
+                            <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+                            홈으로 돌아가기
+                        </Link>
                     </div>
                 </header>
 

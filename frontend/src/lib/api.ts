@@ -54,10 +54,10 @@ export const getInterviewHistory = async (limit: number = 10) => {
     return response.data;
 };
 
-export const analyzeResumeCoaching = async (resumeText: string, noticeText: string) => {
-    const response = await api.post('/api/v1/resume/coach', {
+export const analyzeStarCoach = async (resumeText: string, experienceText: string) => {
+    const response = await api.post('/api/v1/resume/star-coach', {
         resume_text: resumeText,
-        notice_text: noticeText,
+        experience_text: experienceText,
     });
     return response.data;
 };

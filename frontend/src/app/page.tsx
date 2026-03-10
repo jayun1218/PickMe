@@ -5,9 +5,11 @@ import { Mic, FileText, BarChart3, Sparkles, ArrowRight, ChevronRight } from "lu
 import Link from "next/link";
 import ResumeUpload from "@/components/ResumeUpload";
 import CombinedUpload from "@/components/CombinedUpload";
+import ResumeCoach from "@/components/ResumeCoach";
 import QuestionList from "@/components/QuestionList";
 import InterviewChat from "@/components/InterviewChat";
 import FeedbackReport from "@/components/FeedbackReport";
+import ResumeCoachResult from "@/components/ResumeCoachResult";
 import { analyzeInterview } from "@/lib/api";
 
 export default function HomePage() {
@@ -16,7 +18,7 @@ export default function HomePage() {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [feedbackData, setFeedbackData] = useState<any>(null);
     const [scrolled, setScrolled] = useState(false);
-    const [mode, setMode] = useState<"simple" | "combined">("simple");
+    const [mode, setMode] = useState<"simple" | "combined" | "coaching">("simple");
     const [isPressureMode, setIsPressureMode] = useState(false);
 
     useEffect(() => {
@@ -62,17 +64,17 @@ export default function HomePage() {
             {/* Premium Floating Navigation */}
             <nav className={`fixed top-0 left-0 w-full z-[100] transition-all duration-500 px-6 pt-6 flex justify-center ${scrolled ? "pt-4" : "pt-8"
                 }`}>
-                <div className="w-full max-w-[1400px] glass-effect rounded-[28px] pl-20 pr-12 h-20 flex items-center justify-between border border-white/60 shadow-xl shadow-indigo-900/5 relative overflow-hidden">
+                <div className="w-full max-w-[1400px] glass-effect rounded-[28px] px-12 h-20 flex items-center justify-center border border-white/60 shadow-xl shadow-indigo-900/5 relative overflow-hidden">
                     <div className="absolute inset-0 bg-white/40 backdrop-blur-xl -z-10"></div>
                     <div
                         onClick={() => {
                             setAnalysisResult(null);
                             setInterviewQuestion(null);
                             setFeedbackData(null);
+                            setMode("simple");
                             window.scrollTo({ top: 0, behavior: "smooth" });
                         }}
-                        style={{ marginLeft: '40px' }}
-                        className="flex items-center gap-3 group cursor-pointer"
+                        className="absolute left-12 flex items-center gap-3 group cursor-pointer"
                     >
                         <div className="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200 group-hover:rotate-6 transition-transform">
                             <Sparkles className="text-white w-6 h-6" />
@@ -83,13 +85,17 @@ export default function HomePage() {
                     </div>
 
                     <div className="hidden md:flex items-center gap-14 text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">
-                        <Link href="/" className="hover:text-indigo-600 transition-colors">Platform</Link>
+                        <Link href="/" onClick={() => setMode("simple")} className="hover:text-indigo-600 transition-colors">Platform</Link>
                         <Link href="/dashboard" className="hover:text-indigo-600 transition-colors">Dashboard</Link>
+                        <button
+                            onClick={() => setMode("coaching")}
+                            className={`hover:text-indigo-600 transition-colors flex items-center gap-2 ${mode === "coaching" ? "text-indigo-600" : ""}`}
+                        >
+                            Resume Coaching
+                            <span className="bg-indigo-600 text-white text-[8px] px-1.5 py-0.5 rounded-full animate-pulse">New</span>
+                        </button>
                         <a href="#" className="hover:text-indigo-600 transition-colors">Success Stories</a>
                     </div>
-
-                    {/* Spacer to keep menu centered after removing Get Started button */}
-                    <div className="hidden md:block w-[130px]"></div>
                 </div>
             </nav>
 
@@ -147,49 +153,57 @@ export default function HomePage() {
                                 </div>
 
                                 <h1 className="text-[3.5rem] md:text-7xl lg:text-[5.5rem] font-[900] tracking-tighter text-slate-900 leading-[1.1] text-center w-full max-w-5xl">
-                                    합격의 문을 여는 <br />
+                                    {mode === "coaching" ? "합격률을 높이는" : "합격의 문을 여는"} <br />
                                     <span className="text-gradient relative inline-block">
-                                        가장 완벽한 전략
+                                        {mode === "coaching" ? "매력적인 자소서" : "가장 완벽한 전략"}
                                         <Sparkles className="absolute -top-6 -right-10 w-8 h-8 text-indigo-400 animate-pulse" />
                                     </span>
                                 </h1>
 
                                 <p className="text-xl md:text-2xl text-slate-500 max-w-2xl mx-auto leading-relaxed font-medium text-center tracking-tight">
-                                    당신의 이력서와 채용 공고를 정밀 매칭하여 <br />
-                                    합격을 위한 초정밀 면접 질문을 설계해 드립니다.
+                                    {mode === "coaching"
+                                        ? <>당신의 경험을 STAR 기법으로 정교하게 분석하여 <br /> 임팩트 있는 자기소개서 초안을 완성해 드립니다.</>
+                                        : <>당신의 이력서와 채용 공고를 정밀 매칭하여 <br /> 합격을 위한 초정밀 면접 질문을 설계해 드립니다.</>
+                                    }
                                 </p>
                             </div>
 
-                            <div className="flex flex-col items-center gap-6">
-                                {/* Mode Switching Tabs */}
-                                <div className="flex bg-slate-200/50 p-1.5 rounded-[28px] border border-slate-200 backdrop-blur-md shadow-inner">
-                                    <button
-                                        onClick={() => setMode("simple")}
-                                        className={`relative min-w-[220px] px-12 py-4 rounded-[22px] text-[13px] font-black uppercase tracking-widest transition-all duration-300 ${mode === "simple"
-                                            ? "bg-white text-indigo-600 shadow-2xl shadow-indigo-200/50 scale-100"
-                                            : "text-slate-400 hover:text-slate-600 scale-95"
-                                            }`}
-                                    >
-                                        이력서 단독 분석
-                                    </button>
-                                    <button
-                                        onClick={() => setMode("combined")}
-                                        className={`relative min-w-[220px] px-12 py-4 rounded-[22px] text-[13px] font-black uppercase tracking-widest transition-all duration-300 ${mode === "combined"
-                                            ? "bg-white text-indigo-600 shadow-2xl shadow-indigo-200/50 scale-100"
-                                            : "text-slate-400 hover:text-slate-600 scale-95"
-                                            }`}
-                                    >
-                                        기업 맞춤형 매칭
-                                    </button>
+                            {mode !== "coaching" && (
+                                <div className="flex flex-col items-center gap-6">
+                                    {/* Mode Switching Tabs */}
+                                    <div className="flex bg-slate-200/50 p-1.5 rounded-[28px] border border-slate-200 backdrop-blur-md shadow-inner">
+                                        <button
+                                            onClick={() => setMode("simple")}
+                                            className={`relative min-w-[220px] px-12 py-4 rounded-[22px] text-[13px] font-black uppercase tracking-widest transition-all duration-300 ${mode === "simple"
+                                                ? "bg-white text-indigo-600 shadow-2xl shadow-indigo-200/50 scale-100"
+                                                : "text-slate-400 hover:text-slate-600 scale-95"
+                                                }`}
+                                        >
+                                            이력서 단독 분석
+                                        </button>
+                                        <button
+                                            onClick={() => setMode("combined")}
+                                            className={`relative min-w-[220px] px-12 py-4 rounded-[22px] text-[13px] font-black uppercase tracking-widest transition-all duration-300 ${mode === "combined"
+                                                ? "bg-white text-indigo-600 shadow-2xl shadow-indigo-200/50 scale-100"
+                                                : "text-slate-400 hover:text-slate-600 scale-95"
+                                                }`}
+                                        >
+                                            기업 맞춤형 매칭
+                                        </button>
+                                    </div>
+                                    <p className="text-slate-400 text-xs font-bold uppercase tracking-tighter">
+                                        면접 분석 모드를 선택하세요
+                                    </p>
                                 </div>
-                                <p className="text-slate-400 text-xs font-bold uppercase tracking-tighter">분석 모드를 선택하여 시작하세요</p>
-                            </div>
+                            )}
 
                             <div className="py-16 w-full flex justify-center">
                                 {mode === "simple" ? (
                                     <ResumeUpload onAnalysisComplete={handleAnalysisComplete} />
-                                ) : (
+                                ) : mode === "combined" ? (
                                     <CombinedUpload onAnalysisComplete={handleAnalysisComplete} />
+                                ) : (
+                                    <ResumeCoach onAnalysisComplete={handleAnalysisComplete} />
                                 )}
                             </div>
                             <div className="h-[80px] w-full" />
@@ -214,6 +228,11 @@ export default function HomePage() {
                             </div>
                             <div className="h-32 w-full" />
                         </section>
+                    ) : analysisResult.type === 'coaching' ? (
+                        <ResumeCoachResult
+                            data={analysisResult}
+                            onReset={() => setAnalysisResult(null)}
+                        />
                     ) : (
                         <div className="text-left animate-in fade-in slide-in-from-bottom-8 duration-700">
                             <div className="flex justify-between items-start mb-10">

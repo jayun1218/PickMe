@@ -33,6 +33,10 @@ class UrlAnalyzeRequest(BaseModel):
     resume_text: str
     notice_url: str
 
+class ResumeStarCoachRequest(BaseModel):
+    resume_text: str
+    experience_text: str
+
 # CORS 설정
 app.add_middleware(
     CORSMiddleware,
@@ -156,10 +160,10 @@ async def analyze_combined_url(request: UrlAnalyzeRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/v1/resume/coach")
-async def analyze_resume_coaching(resume_text: str, notice_text: str):
+@app.post("/api/v1/resume/star-coach")
+async def analyze_star_coaching(request: ResumeStarCoachRequest):
     try:
-        coaching = await resume_service.generate_resume_coaching(resume_text, notice_text)
+        coaching = await resume_service.generate_star_coaching(request.resume_text, request.experience_text)
         return coaching
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
