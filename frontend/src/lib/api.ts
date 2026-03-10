@@ -16,6 +16,18 @@ export const analyzeResume = async (file: File) => {
     return response.data;
 };
 
+export const extractResumeText = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await api.post('/api/v1/resume/extract', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+    return response.data;
+};
+
 export const analyzeCombined = async (resume: File, notice: File) => {
     const formData = new FormData();
     formData.append('resume', resume);
@@ -29,8 +41,29 @@ export const analyzeCombined = async (resume: File, notice: File) => {
     return response.data;
 };
 
-export const chatWithInterviewer = async (messages: { role: string; content: string }[]) => {
-    const response = await api.post('/api/v1/interview/chat', { messages });
+export const analyzeCombinedUrl = async (resumeText: string, noticeUrl: string) => {
+    const response = await api.post('/api/v1/analyze/combined-url', {
+        resume_text: resumeText,
+        notice_url: noticeUrl,
+    });
+    return response.data;
+};
+
+export const getInterviewHistory = async (limit: number = 10) => {
+    const response = await api.get(`/api/v1/interview/history?limit=${limit}`);
+    return response.data;
+};
+
+export const analyzeResumeCoaching = async (resumeText: string, noticeText: string) => {
+    const response = await api.post('/api/v1/resume/coach', {
+        resume_text: resumeText,
+        notice_text: noticeText,
+    });
+    return response.data;
+};
+
+export const chatWithInterviewer = async (messages: { role: string; content: string }[], context?: any) => {
+    const response = await api.post('/api/v1/interview/chat', { messages, context });
     return response.data;
 };
 

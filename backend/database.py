@@ -52,4 +52,21 @@ class DatabaseManager:
             print(f"DB 저장 중 오류 발생: {e}")
             return None
 
+    async def get_interview_history(self, limit: int = 10):
+        """과거 면접 분석 결과 리스트를 가져옵니다."""
+        if not self.client:
+            return []
+        
+        try:
+            # results와 interviews 테이블을 조인하여 가져옴
+            res = self.client.table("interview_results")\
+                .select("*, interviews(resume_summary, created_at)")\
+                .order("created_at", descending=True)\
+                .limit(limit)\
+                .execute()
+            return res.data
+        except Exception as e:
+            print(f"이력 조회 중 오류 발생: {e}")
+            return []
+
 db_manager = DatabaseManager()

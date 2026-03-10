@@ -91,3 +91,40 @@ class ResumeService:
             return result.get("questions", [])
         except Exception as e:
             raise Exception(f"AI 질문 생성 중 오류 발생: {str(e)}")
+
+    async def generate_resume_coaching(self, resume_text: str, notice_text: str):
+        """채용 공고를 바탕으로 이력서 첨삭 제안을 생성합니다."""
+        if not self.client:
+            return {"coaching": "API 키가 필요합니다."}
+
+        system_prompt = """
+        당신은 전문 커리어 코치입니다. [채용 공고]의 요구사항과 [지원자 이력서]를 비교하여, 
+        합격률을 높이기 위한 구체적인 이력서 수정 제안을 해주세요.
+        
+        포함할 내용:
+        1. 강조해야 할 핵심 키워드 (공고 기반)
+        2. 부족한 경험을 보완할 수 있는 기술 방식
+        3. 구체적인 문장 수정 예시 (Before/After)
+        
+        응답은 반드시 아래의 JSON 형식으로만 해주세요:
+        {
+            "summary": "전체적인 전략 요약",
+            "keywords": ["키워드1", "키워드2"],
+            "suggestions": [
+                {"category": "경험/기술/학력", "issue": "문제점", "improvement": "개선 제안"}
+            ]
+        }
+        """
+        
+        try:
+            response = self.client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": f"[채용 공고]:\n{notice_text}\n\n[이력서]:\n{resume_text}"}
+                ],
+                response_format={"type": "json_object"}
+            )
+            return json.loads(response.choices[0].message.content)
+        except Exception as e:
+            raise Exception(f"첨삭 생성 중 오류 발생: {str(e)}")

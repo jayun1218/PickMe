@@ -1,8 +1,6 @@
-'use client';
-
 import React, { useState } from 'react';
-import { Upload, FileText, CheckCircle2, Loader2, Sparkles, X, Briefcase } from 'lucide-react';
-import { analyzeCombined } from '@/lib/api';
+import { Upload, FileText, CheckCircle2, Loader2, Sparkles, X, Briefcase, Link as LinkIcon } from 'lucide-react';
+import { analyzeCombined, analyzeCombinedUrl, extractResumeText } from '@/lib/api';
 
 interface CombinedUploadProps {
     onAnalysisComplete: (data: any) => void;
@@ -11,17 +9,28 @@ interface CombinedUploadProps {
 export default function CombinedUpload({ onAnalysisComplete }: CombinedUploadProps) {
     const [resumeFile, setResumeFile] = useState<File | null>(null);
     const [noticeFile, setNoticeFile] = useState<File | null>(null);
+    const [noticeUrl, setNoticeUrl] = useState("");
+    const [noticeMode, setNoticeMode] = useState<"file" | "url">("file");
     const [isUploading, setIsUploading] = useState(false);
 
     const handleUpload = async () => {
-        if (!resumeFile || !noticeFile) return;
+        if (!resumeFile || (noticeMode === "file" && !noticeFile) || (noticeMode === "url" && !noticeUrl)) return;
+
         setIsUploading(true);
         try {
-            const data = await analyzeCombined(resumeFile, noticeFile);
+            let data;
+            if (noticeMode === "file" && noticeFile) {
+                data = await analyzeCombined(resumeFile, noticeFile);
+            } else {
+                // 이력서 PDF에서 텍스트 추출 (백엔드 URL 분석용)
+                const { text: resumeText } = await extractResumeText(resumeFile);
+                data = await analyzeCombinedUrl(resumeText, noticeUrl);
+            }
+
             onAnalysisComplete({
                 ...data,
                 filename: resumeFile.name,
-                notice_filename: noticeFile.name
+                notice_filename: noticeMode === "file" ? noticeFile?.name : "Link Analysis"
             });
         } catch (error) {
             console.error('Upload failed:', error);
@@ -43,22 +52,57 @@ export default function CombinedUpload({ onAnalysisComplete }: CombinedUploadPro
                     color="indigo"
                 />
 
-                {/* Notice Upload Box */}
-                <FileBox
-                    title="채용 공고 PDF"
-                    file={noticeFile}
-                    setFile={setNoticeFile}
-                    icon={<Briefcase className="w-8 h-8" />}
-                    color="slate"
-                />
+                {/* Notice Input Box */}
+                <div className="flex flex-col gap-4">
+                    <div className="flex bg-slate-100 p-1.5 rounded-[24px] w-fit mx-auto border border-slate-200 shadow-inner">
+                        <button
+                            onClick={() => setNoticeMode("file")}
+                            className={`px-6 py-2.5 rounded-[18px] text-[11px] font-black uppercase tracking-widest transition-all ${noticeMode === "file" ? "bg-white text-indigo-600 shadow-lg shadow-indigo-100" : "text-slate-400 hover:text-slate-600"}`}
+                        >
+                            PDF 파일
+                        </button>
+                        <button
+                            onClick={() => setNoticeMode("url")}
+                            className={`px-6 py-2.5 rounded-[18px] text-[11px] font-black uppercase tracking-widest transition-all ${noticeMode === "url" ? "bg-white text-indigo-600 shadow-lg shadow-indigo-100" : "text-slate-400 hover:text-slate-600"}`}
+                        >
+                            URL 링크
+                        </button>
+                    </div>
+
+                    {noticeMode === "file" ? (
+                        <FileBox
+                            title="채용 공고 PDF"
+                            file={noticeFile}
+                            setFile={setNoticeFile}
+                            icon={<Briefcase className="w-8 h-8" />}
+                            color="slate"
+                        />
+                    ) : (
+                        <div className="relative group h-64 rounded-[40px] border-4 border-slate-100 bg-white p-8 flex flex-col items-center justify-center transition-all duration-500 hover:border-indigo-100 hover:shadow-2xl hover:shadow-indigo-100/10">
+                            <div className="w-20 h-20 rounded-[28px] bg-indigo-50 text-indigo-500 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all shadow-sm">
+                                <LinkIcon className="w-10 h-10" />
+                            </div>
+                            <div className="w-full space-y-4">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">채용 공고 URL을 입력하세요</p>
+                                <input
+                                    type="url"
+                                    placeholder="https://wanted.co.kr/jobs/..."
+                                    value={noticeUrl}
+                                    onChange={(e) => setNoticeUrl(e.target.value)}
+                                    className="w-full px-8 py-5 rounded-[25px] border-2 border-slate-50 bg-slate-50 focus:bg-white focus:border-indigo-400 focus:outline-none transition-all font-black text-sm text-slate-700 shadow-inner placeholder:text-slate-300"
+                                />
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
 
             <button
                 onClick={handleUpload}
                 disabled={isUploading || !resumeFile || !noticeFile}
                 className={`w-full group relative overflow-hidden h-20 rounded-[30px] font-black text-xl transition-all shadow-2xl flex items-center justify-center gap-3 ${!resumeFile || !noticeFile
-                        ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                        : "bg-slate-900 text-white hover:scale-[1.02] active:scale-95 shadow-indigo-100"
+                    ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                    : "bg-slate-900 text-white hover:scale-[1.02] active:scale-95 shadow-indigo-100"
                     }`}
             >
                 {isUploading ? (

@@ -9,6 +9,7 @@ from services.resume_service import ResumeService
 from services.interview_service import InterviewService
 from services.feedback_service import FeedbackService
 from services.stt_service import STTService
+from services.scraping_service import ScrapingService
 
 load_dotenv()
 
@@ -17,6 +18,7 @@ resume_service = ResumeService()
 interview_service = InterviewService()
 feedback_service = FeedbackService()
 stt_service = STTService()
+scraping_service = ScrapingService()
 
 # API 데이터 모델
 class ChatMessage(BaseModel):
@@ -26,6 +28,10 @@ class ChatMessage(BaseModel):
 class ChatRequest(BaseModel):
     messages: List[ChatMessage]
     context: Optional[dict] = None
+
+class UrlAnalyzeRequest(BaseModel):
+    resume_text: str
+    notice_url: str
 
 # CORS 설정
 app.add_middleware(
@@ -73,6 +79,26 @@ async def analyze_resume(file: UploadFile = File(...)):
         if os.path.exists(temp_path):
             os.remove(temp_path)
 
+@app.post("/api/v1/resume/extract")
+async def extract_resume_text(file: UploadFile = File(...)):
+    if not file.filename.endswith('.pdf'):
+        raise HTTPException(status_code=400, detail="PDF 파일만 가능합니다.")
+
+    temp_dir = "temp"
+    os.makedirs(temp_dir, exist_ok=True)
+    temp_path = os.path.join(temp_dir, f"extract_{file.filename}")
+
+    try:
+        with open(temp_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        text = resume_service.extract_text_from_pdf(temp_path)
+        return {"text": text}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+
 @app.post("/api/v1/analyze/combined")
 async def analyze_combined(resume: UploadFile = File(...), notice: UploadFile = File(...)):
     if not resume.filename.endswith('.pdf') or not notice.filename.endswith('.pdf'):
@@ -110,6 +136,34 @@ async def analyze_combined(resume: UploadFile = File(...), notice: UploadFile = 
             if os.path.exists(p):
                 os.remove(p)
 
+@app.post("/api/v1/analyze/combined-url")
+async def analyze_combined_url(request: UrlAnalyzeRequest):
+    try:
+        # URL에서 텍스트 추출
+        notice_text = await scraping_service.extract_text_from_url(request.notice_url)
+        
+        # 통합 분석
+        questions = await resume_service.generate_combined_analysis(request.resume_text, notice_text)
+        
+        # 이력서 첨삭 가이드 생성
+        coaching = await resume_service.generate_resume_coaching(request.resume_text, notice_text)
+
+        return {
+            "questions": questions,
+            "resume_coaching": coaching,
+            "notice_text_preview": notice_text[:200]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/v1/resume/coach")
+async def analyze_resume_coaching(resume_text: str, notice_text: str):
+    try:
+        coaching = await resume_service.generate_resume_coaching(resume_text, notice_text)
+        return coaching
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/api/v1/interview/chat")
 async def chat_with_interviewer(request: ChatRequest):
     try:
@@ -127,11 +181,20 @@ async def analyze_interview_result(request: ChatRequest):
         messages = [{"role": m.role, "content": m.content} for m in request.messages]
         feedback = await feedback_service.analyze_interview(messages)
         
-        # 데이터베이스 저장 (비동기 처리 권장되나 여기서는 단순하게 호출)
+        # 데이터베이스 저장
         from database import db_manager
         await db_manager.save_interview_result(messages, feedback)
         
         return feedback
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/v1/interview/history")
+async def get_interview_history(limit: int = 10):
+    try:
+        from database import db_manager
+        history = await db_manager.get_interview_history(limit)
+        return history
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 @app.post("/api/v1/interview/stt")

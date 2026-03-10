@@ -18,6 +18,8 @@ class InterviewService:
     async def get_next_response(self, messages: list, context: dict = None):
         """이전 대화 기록과 컨텍스트를 바탕으로 AI 면접관의 다음 응답을 생성합니다."""
         
+        is_pressure_mode = context.get("is_pressure_mode", False) if context else False
+        
         if not self.client:
             # Mock 응답
             return {
@@ -26,7 +28,7 @@ class InterviewService:
                 "is_finished": False
             }
 
-        persona_prompt = """
+        base_persona = """
         당신은 실력 있는 시니어 면접관 '피키(Picky)'입니다. 
         사용자가 제출한 이력서와 이전 질문들에 대한 답변을 바탕으로 면접을 진행하세요.
         
@@ -35,7 +37,18 @@ class InterviewService:
         2. 사용자의 답변이 모호하다면 구체적인 수치나 경험을 묻는 '꼬리 질문'을 던지세요.
         3. 답변이 충분하다면 "좋습니다. 다음 주제로 넘어가죠."와 함께 다음 면접 질문으로 부드럽게 전환하세요.
         4. 면접이 모두 종료되었다고 판단되면 면접을 마무리하는 인사를 하세요.
-        
+        """
+
+        pressure_instruction = """
+        [압박 면접 모드 활성화됨]
+        - 답변의 논리적 허점을 집요하게 파고드세요.
+        - "방금 말씀하신 내용은 ~와 모순되는 것 같은데 어떻게 생각하시나요?"와 같은 도전적인 질문을 던지세요.
+        - 지원자의 스트레스 내성과 논리적 방어 능력을 테스트하세요.
+        - 친절하기보다는 직설적이고 차가운 태도를 유지하세요.
+        - 답변이 완벽하지 않으면 쉽게 포기하지 말고 꼬리에 꼬리를 무는 질문을 하세요.
+        """
+
+        system_prompt = base_persona + (pressure_instruction if is_pressure_mode else "") + """
         응답은 반드시 아래의 JSON 형식으로만 해주세요:
         {
             "content": "면접관의 응답 내용",
@@ -44,7 +57,7 @@ class InterviewService:
         """
 
         try:
-            full_messages = [{"role": "system", "content": persona_prompt}] + messages
+            full_messages = [{"role": "system", "content": system_prompt}] + messages
             
             response = self.client.chat.completions.create(
                 model="gpt-4o",

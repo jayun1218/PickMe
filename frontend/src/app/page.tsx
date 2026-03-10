@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Mic, FileText, BarChart3, Sparkles, ArrowRight, ChevronRight } from "lucide-react";
+import Link from "next/link";
 import ResumeUpload from "@/components/ResumeUpload";
 import CombinedUpload from "@/components/CombinedUpload";
 import QuestionList from "@/components/QuestionList";
@@ -16,6 +17,7 @@ export default function HomePage() {
     const [feedbackData, setFeedbackData] = useState<any>(null);
     const [scrolled, setScrolled] = useState(false);
     const [mode, setMode] = useState<"simple" | "combined">("simple");
+    const [isPressureMode, setIsPressureMode] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -72,8 +74,8 @@ export default function HomePage() {
                     </div>
 
                     <div className="hidden md:flex items-center gap-10 text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">
-                        <a href="#" className="hover:text-indigo-600 transition-colors">Platform</a>
-                        <a href="#" className="hover:text-indigo-600 transition-colors">Solutions</a>
+                        <Link href="/" className="hover:text-indigo-600 transition-colors">Platform</Link>
+                        <Link href="/dashboard" className="hover:text-indigo-600 transition-colors">Dashboard</Link>
                         <a href="#" className="hover:text-indigo-600 transition-colors">Success Stories</a>
                     </div>
 
@@ -118,6 +120,7 @@ export default function HomePage() {
                             <InterviewChat
                                 initialQuestion={interviewQuestion}
                                 onFinish={finishInterview}
+                                isPressureMode={isPressureMode}
                             />
                         </div>
                     ) : !analysisResult ? (
@@ -196,15 +199,31 @@ export default function HomePage() {
                         </section>
                     ) : (
                         <div className="text-left animate-in fade-in slide-in-from-bottom-8 duration-700">
-                            <button
-                                onClick={() => setAnalysisResult(null)}
-                                className="mb-10 text-indigo-600 font-bold flex items-center gap-2 hover:translate-x-[-4px] transition-transform"
-                            >
-                                <div className="w-8 h-8 rounded-full bg-white border border-slate-100 flex items-center justify-center">
-                                    <ChevronRight className="w-4 h-4 rotate-180" />
+                            <div className="flex justify-between items-start mb-10">
+                                <button
+                                    onClick={() => setAnalysisResult(null)}
+                                    className="text-indigo-600 font-bold flex items-center gap-2 hover:translate-x-[-4px] transition-transform"
+                                >
+                                    <div className="w-8 h-8 rounded-full bg-white border border-slate-100 flex items-center justify-center">
+                                        <ChevronRight className="w-4 h-4 rotate-180" />
+                                    </div>
+                                    Upload different resume
+                                </button>
+
+                                {/* Pressure Mode Toggle */}
+                                <div className="flex items-center gap-4 bg-white p-2 pl-6 rounded-full border border-slate-100 shadow-xl shadow-indigo-100/20 group">
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] font-black text-slate-900 uppercase tracking-tighter">Pressure Mode</span>
+                                        <span className="text-[9px] font-bold text-slate-400">심층 꼬리 질문 활성화</span>
+                                    </div>
+                                    <button
+                                        onClick={() => setIsPressureMode(!isPressureMode)}
+                                        className={`w-14 h-8 rounded-full p-1 transition-all duration-500 ${isPressureMode ? "bg-slate-900" : "bg-slate-200"}`}
+                                    >
+                                        <div className={`w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-500 ${isPressureMode ? "translate-x-6" : "translate-x-0"}`} />
+                                    </button>
                                 </div>
-                                Upload different resume
-                            </button>
+                            </div>
 
                             <header className="mb-16">
                                 <h2 className="text-4xl font-[900] text-slate-900 mb-4 tracking-tight">AI가 설계한 <br />맞춤 면접 질문 리스트</h2>
@@ -219,6 +238,32 @@ export default function HomePage() {
                                     )}
                                 </div>
                             </header>
+
+                            {/* Resume Coaching Section (If available) */}
+                            {analysisResult.resume_coaching && (
+                                <div className="mb-20 p-10 rounded-[45px] bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 shadow-xl shadow-indigo-100/30 overflow-hidden relative">
+                                    <div className="relative z-10">
+                                        <div className="flex items-center gap-3 mb-6">
+                                            <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center">
+                                                <Sparkles className="w-5 h-5" />
+                                            </div>
+                                            <h3 className="text-xl font-black text-slate-900 tracking-tight">AI 이력서 첨삭 리포트</h3>
+                                        </div>
+                                        <p className="text-slate-600 font-bold mb-8 leading-relaxed">{analysisResult.resume_coaching.summary}</p>
+
+                                        <div className="grid md:grid-cols-2 gap-6">
+                                            {analysisResult.resume_coaching.suggestions.map((s: any, i: number) => (
+                                                <div key={i} className="p-6 bg-white rounded-3xl border border-indigo-50 shadow-sm">
+                                                    <span className="inline-block px-3 py-1 bg-indigo-50 text-indigo-600 text-[9px] font-black rounded-lg mb-3 uppercase tracking-widest">{s.category}</span>
+                                                    <p className="text-slate-400 text-[11px] font-bold mb-2">문제점: {s.issue}</p>
+                                                    <p className="text-indigo-900 text-[13px] font-black leading-snug">개선 제안: {s.improvement}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <Sparkles className="absolute -bottom-10 -right-10 w-40 h-40 text-indigo-200/20 rotate-12" />
+                                </div>
+                            )}
 
                             <div className="space-y-6">
                                 <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Select a question to practice</p>

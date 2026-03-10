@@ -13,9 +13,10 @@ interface Message {
 interface InterviewChatProps {
     initialQuestion: string;
     onFinish: (transcript: Message[]) => void;
+    isPressureMode?: boolean;
 }
 
-export default function InterviewChat({ initialQuestion, onFinish }: InterviewChatProps) {
+export default function InterviewChat({ initialQuestion, onFinish, isPressureMode = false }: InterviewChatProps) {
     const [messages, setMessages] = useState<Message[]>([
         { role: 'assistant', content: initialQuestion }
     ]);
@@ -40,7 +41,7 @@ export default function InterviewChat({ initialQuestion, onFinish }: InterviewCh
         setIsLoading(true);
 
         try {
-            const data = await chatWithInterviewer(newMessages);
+            const data = await chatWithInterviewer(newMessages, { is_pressure_mode: isPressureMode });
             const aiMessage: Message = {
                 role: 'assistant',
                 content: data.content
@@ -103,15 +104,15 @@ export default function InterviewChat({ initialQuestion, onFinish }: InterviewCh
                         className={`flex items-start gap-4 ${m.role === 'user' ? 'flex-row-reverse' : ''} animate-in fade-in slide-in-from-bottom-4 duration-500`}
                     >
                         <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-sm ${m.role === 'assistant'
-                                ? 'bg-white border border-slate-100 text-indigo-600'
-                                : 'bg-slate-900 text-white'
+                            ? 'bg-white border border-slate-100 text-indigo-600'
+                            : 'bg-slate-900 text-white'
                             }`}>
                             {m.role === 'assistant' ? <Bot className="w-6 h-6" /> : <User className="w-6 h-6" />}
                         </div>
 
                         <div className={`max-w-[75%] p-6 rounded-3xl text-base leading-relaxed font-medium shadow-sm border ${m.role === 'assistant'
-                                ? 'bg-white border-slate-50 text-slate-700 rounded-tl-none'
-                                : 'bg-slate-900 border-slate-900 text-white rounded-tr-none'
+                            ? 'bg-white border-slate-50 text-slate-700 rounded-tl-none'
+                            : 'bg-slate-900 border-slate-900 text-white rounded-tr-none'
                             }`}>
                             {m.content}
                         </div>
