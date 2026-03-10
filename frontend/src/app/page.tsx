@@ -10,6 +10,7 @@ import QuestionList from "@/components/QuestionList";
 import InterviewChat from "@/components/InterviewChat";
 import FeedbackReport from "@/components/FeedbackReport";
 import ResumeCoachResult from "@/components/ResumeCoachResult";
+import Dashboard from "@/components/Dashboard";
 import { analyzeInterview } from "@/lib/api";
 
 export default function HomePage() {
@@ -18,7 +19,7 @@ export default function HomePage() {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [feedbackData, setFeedbackData] = useState<any>(null);
     const [scrolled, setScrolled] = useState(false);
-    const [mode, setMode] = useState<"simple" | "combined" | "coaching">("simple");
+    const [mode, setMode] = useState<"simple" | "combined" | "coaching" | "dashboard">("simple");
     const [isPressureMode, setIsPressureMode] = useState(false);
 
     useEffect(() => {
@@ -86,13 +87,17 @@ export default function HomePage() {
 
                     <div className="hidden md:flex items-center gap-14 text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">
                         <Link href="/" onClick={() => setMode("simple")} className="hover:text-indigo-600 transition-colors">Platform</Link>
-                        <Link href="/dashboard" className="hover:text-indigo-600 transition-colors">Dashboard</Link>
+                        <button
+                            onClick={() => setMode("dashboard")}
+                            className={`hover:text-indigo-600 transition-colors ${mode === "dashboard" ? "text-indigo-600" : ""}`}
+                        >
+                            Dashboard
+                        </button>
                         <button
                             onClick={() => setMode("coaching")}
                             className={`hover:text-indigo-600 transition-colors flex items-center gap-2 ${mode === "coaching" ? "text-indigo-600" : ""}`}
                         >
                             Resume Coaching
-                            <span className="bg-indigo-600 text-white text-[8px] px-1.5 py-0.5 rounded-full animate-pulse">New</span>
                         </button>
                         <a href="#" className="hover:text-indigo-600 transition-colors">Success Stories</a>
                     </div>
@@ -153,22 +158,24 @@ export default function HomePage() {
                                 </div>
 
                                 <h1 className="text-[3.5rem] md:text-7xl lg:text-[5.5rem] font-[900] tracking-tighter text-slate-900 leading-[1.1] text-center w-full max-w-5xl">
-                                    {mode === "coaching" ? "합격률을 높이는" : "합격의 문을 여는"} <br />
+                                    {mode === "coaching" ? "합격률을 높이는" : mode === "dashboard" ? "당신의 성장을 기록하는" : "합격의 문을 여는"} <br />
                                     <span className="text-gradient relative inline-block">
-                                        {mode === "coaching" ? "매력적인 자소서" : "가장 완벽한 전략"}
-                                        <Sparkles className="absolute -top-6 -right-10 w-8 h-8 text-indigo-400 animate-pulse" />
+                                        {mode === "coaching" ? "매력적인 자소서" : mode === "dashboard" ? "스마트 대시보드" : "가장 완벽한 전략"}
+                                        <Sparkles className="absolute -top-4 -right-8 w-6 h-6 text-indigo-400 animate-pulse" />
                                     </span>
                                 </h1>
 
                                 <p className="text-xl md:text-2xl text-slate-500 max-w-2xl mx-auto leading-relaxed font-medium text-center tracking-tight">
                                     {mode === "coaching"
                                         ? <>당신의 경험을 STAR 기법으로 정교하게 분석하여 <br /> 임팩트 있는 자기소개서 초안을 완성해 드립니다.</>
-                                        : <>당신의 이력서와 채용 공고를 정밀 매칭하여 <br /> 합격을 위한 초정밀 면접 질문을 설계해 드립니다.</>
+                                        : mode === "dashboard"
+                                            ? <>지금까지의 면접 여정을 분석하여 <br /> 더 완벽한 합격 전략을 제시합니다.</>
+                                            : <>당신의 이력서와 채용 공고를 정밀 매칭하여 <br /> 합격을 위한 초정밀 면접 질문을 설계해 드립니다.</>
                                     }
                                 </p>
                             </div>
 
-                            {mode !== "coaching" && (
+                            {mode !== "coaching" && mode !== "dashboard" && (
                                 <div className="flex flex-col items-center gap-6">
                                     {/* Mode Switching Tabs */}
                                     <div className="flex bg-slate-200/50 p-1.5 rounded-[28px] border border-slate-200 backdrop-blur-md shadow-inner">
@@ -202,30 +209,34 @@ export default function HomePage() {
                                     <ResumeUpload onAnalysisComplete={handleAnalysisComplete} />
                                 ) : mode === "combined" ? (
                                     <CombinedUpload onAnalysisComplete={handleAnalysisComplete} />
-                                ) : (
+                                ) : mode === "coaching" ? (
                                     <ResumeCoach onAnalysisComplete={handleAnalysisComplete} />
+                                ) : (
+                                    <Dashboard />
                                 )}
                             </div>
                             <div className="h-[80px] w-full" />
 
                             {/* Feature Grid */}
-                            <div className="grid md:grid-cols-3 gap-16 w-full max-w-6xl border-t border-slate-100/50 pt-20">
-                                <FeatureItem
-                                    icon={<FileText className="w-8 h-8" />}
-                                    title="Deep Analysis"
-                                    description="이력서의 텍스트를 정밀 분석하여 직무 맞춤형 질문지를 즉시 생성합니다."
-                                />
-                                <FeatureItem
-                                    icon={<Mic className="w-8 h-8" />}
-                                    title="Voice Interview"
-                                    description="Whisper STT 기술로 실제 목소리를 통해 자연스러운 답변 연습이 가능합니다."
-                                />
-                                <FeatureItem
-                                    icon={<BarChart3 className="w-8 h-8" />}
-                                    title="AI Feedback"
-                                    description="모든 답변의 논리성과 직무 적합성을 점수와 차트로 시각화하여 제공합니다."
-                                />
-                            </div>
+                            {mode !== "dashboard" && (
+                                <div className="grid md:grid-cols-3 gap-16 w-full max-w-6xl border-t border-slate-100/50 pt-20">
+                                    <FeatureItem
+                                        icon={<FileText className="w-8 h-8" />}
+                                        title="Deep Analysis"
+                                        description="이력서의 텍스트를 정밀 분석하여 직무 맞춤형 질문지를 즉시 생성합니다."
+                                    />
+                                    <FeatureItem
+                                        icon={<Mic className="w-8 h-8" />}
+                                        title="Voice Interview"
+                                        description="Whisper STT 기술로 실제 목소리를 통해 자연스러운 답변 연습이 가능합니다."
+                                    />
+                                    <FeatureItem
+                                        icon={<BarChart3 className="w-8 h-8" />}
+                                        title="AI Feedback"
+                                        description="모든 답변의 논리성과 직무 적합성을 점수와 차트로 시각화하여 제공합니다."
+                                    />
+                                </div>
+                            )}
                             <div className="h-32 w-full" />
                         </section>
                     ) : analysisResult.type === 'coaching' ? (
