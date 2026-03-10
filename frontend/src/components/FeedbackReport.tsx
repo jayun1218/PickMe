@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { BarChart3, ThumbsUp, AlertCircle, RotateCcw, PieChart } from 'lucide-react';
+import { BarChart3, ThumbsUp, AlertCircle, RotateCcw, PieChart, Star, Target, Zap } from 'lucide-react';
 
 interface FeedbackData {
     scores: {
@@ -22,37 +22,45 @@ interface FeedbackReportProps {
 
 export default function FeedbackReport({ data, onRestart }: FeedbackReportProps) {
     const scoreItems = [
-        { label: '논리성', value: data.scores.logical_thinking, color: 'bg-blue-500' },
-        { label: '직무 적합성', value: data.scores.job_suitability, color: 'bg-indigo-500' },
-        { label: '전달력', value: data.scores.clarity, color: 'bg-violet-500' },
-        { label: '키워드 활용', value: data.scores.keyword_usage, color: 'bg-purple-500' },
+        { label: '논리적 사고', value: data.scores.logical_thinking, color: 'from-blue-500 to-indigo-600', icon: <Target className="w-4 h-4" /> },
+        { label: '직무 적합성', value: data.scores.job_suitability, color: 'from-indigo-500 to-violet-600', icon: <Zap className="w-4 h-4" /> },
+        { label: '전달력', value: data.scores.clarity, color: 'from-violet-500 to-purple-600', icon: <Star className="w-4 h-4" /> },
+        { label: '키워드 활용', value: data.scores.keyword_usage, color: 'from-purple-500 to-pink-600', icon: <BarChart3 className="w-4 h-4" /> },
     ];
 
     return (
-        <div className="w-full max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-            {/* Header Card */}
-            <div className="bg-white p-10 rounded-[40px] border border-slate-100 shadow-2xl shadow-slate-200/50">
-                <h2 className="text-3xl font-extrabold text-slate-900 mb-8 flex items-center gap-3">
-                    <BarChart3 className="text-indigo-600 w-8 h-8" />
-                    면접 분석 리포트
-                </h2>
+        <div className="w-full max-w-5xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-12 duration-1000">
+            {/* Main Analysis Dashboard */}
+            <div className="bg-white p-12 rounded-[50px] border border-slate-50 shadow-2xl shadow-indigo-100/40 relative overflow-hidden">
+                {/* Background Decorative Element */}
+                <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-50/50 rounded-full blur-3xl -z-10"></div>
 
-                <div className="grid md:grid-cols-2 gap-12">
-                    {/* Circular/Bar Scores */}
-                    <div className="space-y-6">
-                        <p className="text-sm font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                            <PieChart className="w-4 h-4" /> 역량별 점수
-                        </p>
-                        <div className="space-y-5">
+                <div className="flex flex-col md:flex-row gap-16">
+                    {/* Left: Scores Side */}
+                    <div className="flex-1 space-y-10">
+                        <header className="space-y-2">
+                            <div className="flex items-center gap-3 text-indigo-600">
+                                <PieChart className="w-6 h-6" />
+                                <span className="text-[11px] font-black uppercase tracking-[0.3em]">Performance Metrics</span>
+                            </div>
+                            <h2 className="text-4xl font-black text-slate-900 tracking-tight">AI 역량 분석 리포트</h2>
+                        </header>
+
+                        <div className="grid gap-8">
                             {scoreItems.map((item) => (
-                                <div key={item.label} className="space-y-2">
-                                    <div className="flex justify-between text-sm font-bold">
-                                        <span className="text-slate-600">{item.label}</span>
-                                        <span className="text-slate-900">{item.value}점</span>
+                                <div key={item.label} className="space-y-3 group">
+                                    <div className="flex justify-between items-end px-1">
+                                        <div className="flex items-center gap-2 text-slate-500 font-bold text-sm">
+                                            {item.icon}
+                                            {item.label}
+                                        </div>
+                                        <span className="text-2xl font-black text-slate-900 tracking-tighter">
+                                            {item.value}<span className="text-sm font-medium text-slate-400 ml-0.5">/100</span>
+                                        </span>
                                     </div>
-                                    <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                                    <div className="h-4 bg-slate-50 rounded-full overflow-hidden p-0.5 border border-slate-100">
                                         <div
-                                            className={`h-full ${item.color} transition-all duration-1000 ease-out`}
+                                            className={`h-full bg-gradient-to-r ${item.color} rounded-full transition-all duration-1000 ease-out shadow-lg shadow-indigo-200/50`}
                                             style={{ width: `${item.value}%` }}
                                         ></div>
                                     </div>
@@ -61,42 +69,60 @@ export default function FeedbackReport({ data, onRestart }: FeedbackReportProps)
                         </div>
                     </div>
 
-                    {/* Overall Comments */}
-                    <div className="bg-slate-50 p-8 rounded-3xl space-y-4">
-                        <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">종합 평가</p>
-                        <p className="text-lg text-slate-700 leading-relaxed font-medium italic">
-                            "{data.overall_feedback}"
-                        </p>
+                    {/* Right: Summary Side */}
+                    <div className="w-full md:w-80 flex flex-col pt-4">
+                        <div className="flex-1 h-full bg-slate-50 p-10 rounded-[40px] flex flex-col justify-center relative">
+                            <div className="absolute top-8 left-8 text-slate-200 font-serif text-6xl leading-none">“</div>
+                            <p className="text-xl text-slate-700 leading-relaxed font-bold italic z-10 text-center">
+                                {data.overall_feedback}
+                            </p>
+                            <div className="absolute bottom-8 right-8 text-slate-200 font-serif text-6xl leading-none rotate-180">“</div>
+                        </div>
+                        <p className="mt-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Synthetic Insight by PickMe</p>
                     </div>
                 </div>
             </div>
 
-            {/* Strengths & Improvements */}
-            <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-white p-8 rounded-[32px] border border-slate-100 shadow-lg">
-                    <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2 text-green-600">
-                        <ThumbsUp className="w-6 h-6" />
-                        나의 강점
-                    </h3>
+            {/* Qualititative Cards */}
+            <div className="grid md:grid-cols-2 gap-8">
+                {/* Strengths Card */}
+                <div className="bg-white p-10 rounded-[45px] border border-slate-50 shadow-xl hover:shadow-2xl hover:shadow-green-100/30 transition-all group">
+                    <div className="flex items-center gap-4 mb-8">
+                        <div className="w-14 h-14 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center group-hover:bg-green-500 group-hover:text-white transition-all shadow-sm">
+                            <ThumbsUp className="w-7 h-7" />
+                        </div>
+                        <div>
+                            <h3 className="text-2xl font-black text-slate-900 tracking-tight">Key Strengths</h3>
+                            <p className="text-xs text-green-600/70 font-bold uppercase tracking-widest">강점 분석</p>
+                        </div>
+                    </div>
+
                     <ul className="space-y-4">
                         {data.strengths.map((s, i) => (
-                            <li key={i} className="flex items-start gap-3 p-4 bg-green-50 rounded-2xl text-green-800 text-sm font-medium">
-                                <span className="mt-1 w-1.5 h-1.5 bg-green-500 rounded-full shrink-0"></span>
+                            <li key={i} className="flex items-start gap-4 p-5 bg-green-50/50 rounded-3xl text-slate-700 text-base font-bold transition-all hover:translate-x-1 group/item">
+                                <div className="mt-1.5 w-2 h-2 bg-green-500 rounded-full shrink-0 group-hover/item:scale-150 transition-transform"></div>
                                 {s}
                             </li>
                         ))}
                     </ul>
                 </div>
 
-                <div className="bg-white p-8 rounded-[32px] border border-slate-100 shadow-lg">
-                    <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2 text-amber-600">
-                        <AlertCircle className="w-6 h-6" />
-                        보완할 점
-                    </h3>
+                {/* Improvements Card */}
+                <div className="bg-white p-10 rounded-[45px] border border-slate-50 shadow-xl hover:shadow-2xl hover:shadow-amber-100/30 transition-all group">
+                    <div className="flex items-center gap-4 mb-8">
+                        <div className="w-14 h-14 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center group-hover:bg-amber-500 group-hover:text-white transition-all shadow-sm">
+                            <AlertCircle className="w-7 h-7" />
+                        </div>
+                        <div>
+                            <h3 className="text-2xl font-black text-slate-900 tracking-tight">Areas for Growth</h3>
+                            <p className="text-xs text-amber-600/70 font-bold uppercase tracking-widest">보완 가이드</p>
+                        </div>
+                    </div>
+
                     <ul className="space-y-4">
                         {data.improvements.map((s, i) => (
-                            <li key={i} className="flex items-start gap-3 p-4 bg-amber-50 rounded-2xl text-amber-800 text-sm font-medium">
-                                <span className="mt-1 w-1.5 h-1.5 bg-amber-500 rounded-full shrink-0"></span>
+                            <li key={i} className="flex items-start gap-4 p-5 bg-amber-50/50 rounded-3xl text-slate-700 text-base font-bold transition-all hover:translate-x-1 group/item">
+                                <div className="mt-1.5 w-2 h-2 bg-amber-500 rounded-full shrink-0 group-hover/item:scale-150 transition-transform"></div>
                                 {s}
                             </li>
                         ))}
@@ -104,15 +130,16 @@ export default function FeedbackReport({ data, onRestart }: FeedbackReportProps)
                 </div>
             </div>
 
-            {/* Actions */}
-            <div className="flex justify-center pt-8">
+            {/* Action Area */}
+            <div className="flex flex-col items-center gap-8 py-10">
                 <button
                     onClick={onRestart}
-                    className="flex items-center gap-2 bg-slate-900 text-white px-10 py-5 rounded-2xl font-bold hover:scale-105 transition-all shadow-xl shadow-slate-200"
+                    className="group flex items-center gap-4 bg-slate-900 text-white px-12 py-6 rounded-[30px] font-black text-xl hover:scale-105 transition-all shadow-2xl shadow-indigo-100/50 hover:bg-gradient-premium ring-8 ring-transparent hover:ring-indigo-50"
                 >
-                    <RotateCcw className="w-5 h-5" />
+                    <RotateCcw className="w-6 h-6 group-hover:rotate-180 transition-transform duration-700" />
                     다른 질문으로 연습하기
                 </button>
+                <p className="text-slate-400 font-black text-[11px] uppercase tracking-[0.4em]">Ready for your next challenge?</p>
             </div>
         </div>
     );
