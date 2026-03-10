@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from services.resume_service import ResumeService
 from services.interview_service import InterviewService
 from services.feedback_service import FeedbackService
+from services.stt_service import STTService
 
 load_dotenv()
 
@@ -15,6 +16,7 @@ app = FastAPI(title="PickMe API")
 resume_service = ResumeService()
 interview_service = InterviewService()
 feedback_service = FeedbackService()
+stt_service = STTService()
 
 # API 데이터 모델
 class ChatMessage(BaseModel):
@@ -93,5 +95,27 @@ async def analyze_interview_result(request: ChatRequest):
         await db_manager.save_interview_result(messages, feedback)
         
         return feedback
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+@app.post("/api/v1/interview/stt")
+async def transcribe_voice(file: UploadFile = File(...)):
+    try:
+        # 임시 파일 저장
+        temp_dir = "temp"
+        if not os.path.exists(temp_dir):
+            os.makedirs(temp_dir)
+            
+        temp_path = os.path.join(temp_dir, file.filename)
+        with open(temp_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+            
+        # STT 수행
+        text = await stt_service.transcribe_audio(temp_path)
+        
+        # 임시 파일 삭제
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+            
+        return {"text": text}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

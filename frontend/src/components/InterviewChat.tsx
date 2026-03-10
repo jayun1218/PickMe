@@ -1,8 +1,7 @@
-'use client';
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, User, Bot, Loader2, StopCircle } from 'lucide-react';
 import { chatWithInterviewer } from '@/lib/api';
+import VoiceRecorder from './VoiceRecorder';
 
 interface Message {
     role: 'user' | 'assistant';
@@ -29,10 +28,11 @@ export default function InterviewChat({ initialQuestion, onFinish }: InterviewCh
         }
     }, [messages]);
 
-    const handleSend = async () => {
-        if (!input.trim() || isLoading) return;
+    const handleSend = async (overrideContent?: string) => {
+        const contentToSend = overrideContent || input;
+        if (!contentToSend.trim() || isLoading) return;
 
-        const userMessage: Message = { role: 'user', content: input };
+        const userMessage: Message = { role: 'user', content: contentToSend };
         const newMessages = [...messages, userMessage];
         setMessages(newMessages);
         setInput('');
@@ -56,6 +56,10 @@ export default function InterviewChat({ initialQuestion, onFinish }: InterviewCh
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleTranscription = (text: string) => {
+        handleSend(text);
     };
 
     return (
@@ -98,8 +102,8 @@ export default function InterviewChat({ initialQuestion, onFinish }: InterviewCh
                             {m.role === 'assistant' ? <Bot className="w-5 h-5" /> : <User className="w-5 h-5" />}
                         </div>
                         <div className={`max-w-[80%] p-4 rounded-2xl text-sm leading-relaxed ${m.role === 'assistant'
-                                ? 'bg-slate-50 text-slate-800 rounded-tl-none'
-                                : 'bg-indigo-600 text-white rounded-tr-none'
+                            ? 'bg-slate-50 text-slate-800 rounded-tl-none'
+                            : 'bg-indigo-600 text-white rounded-tr-none'
                             }`}>
                             {m.content}
                         </div>
@@ -119,23 +123,29 @@ export default function InterviewChat({ initialQuestion, onFinish }: InterviewCh
 
             {/* Input Area */}
             <div className="p-4 border-t border-slate-50 bg-white">
-                <div className="relative flex items-center">
-                    <input
-                        type="text"
-                        className="w-full pl-4 pr-12 py-4 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500/20 transition-all outline-none"
-                        placeholder="답변을 입력하세요..."
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                        disabled={isLoading}
+                <div className="flex items-center gap-3">
+                    <VoiceRecorder
+                        onTranscriptionComplete={handleTranscription}
+                        isDisabled={isLoading}
                     />
-                    <button
-                        onClick={handleSend}
-                        disabled={!input.trim() || isLoading}
-                        className="absolute right-2 p-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all disabled:opacity-30"
-                    >
-                        <Send className="w-5 h-5" />
-                    </button>
+                    <div className="relative flex-1">
+                        <input
+                            type="text"
+                            className="w-full pl-4 pr-12 py-4 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500/20 transition-all outline-none"
+                            placeholder="답변을 입력하거나 마이크를 눌러 말씀하세요..."
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                            disabled={isLoading}
+                        />
+                        <button
+                            onClick={() => handleSend()}
+                            disabled={!input.trim() || isLoading}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all disabled:opacity-30"
+                        >
+                            <Send className="w-5 h-5" />
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
