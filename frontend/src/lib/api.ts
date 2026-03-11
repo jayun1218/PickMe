@@ -86,7 +86,6 @@ export const transcribeAudio = async (audioBlob: Blob) => {
 
 export default api;
 // 취업 캘린더 관련 API
-// 취업 캘린더 관련 API
 export const getJobs = async () => {
     const response = await api.get('/api/v1/jobs');
     return response.data;

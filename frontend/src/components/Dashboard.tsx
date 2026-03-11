@@ -120,18 +120,18 @@ export default function Dashboard() {
         <div className="space-y-12 animate-in fade-in slide-in-from-bottom-12 duration-1000 w-full max-w-6xl">
             {/* Mental Care & D-Day Banner */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-[40px] p-10 text-white shadow-2xl shadow-indigo-200 relative overflow-hidden group">
+                <div className="lg:col-span-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-[40px] p-12 text-white shadow-2xl shadow-indigo-200 relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl group-hover:scale-110 transition-transform duration-1000"></div>
-                    <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
-                        <div className="space-y-4 text-center md:text-left">
-                            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/20 rounded-full text-[10px] font-black uppercase tracking-widest backdrop-blur-md">
+                    <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
+                        <div className="space-y-6 text-center md:text-left">
+                            <div className="inline-flex items-center gap-2 px-5 py-2 bg-white/20 rounded-full text-[10px] font-black uppercase tracking-widest backdrop-blur-md">
                                 <Heart className="w-3 h-3 fill-white" /> AI Daily Support
                             </div>
                             <h2 className="text-3xl md:text-4xl font-black leading-tight tracking-tight">
                                 "지치지 마세요. 당신의 <br />
                                 가능성은 데이터가 증명합니다."
                             </h2>
-                            <p className="text-indigo-100 font-bold opacity-80 max-w-md">
+                            <p className="text-indigo-100 font-bold opacity-80 max-w-md leading-relaxed">
                                 오늘의 조언: 답변 시 '결과' 보다는 '과정에서의 문제 해결 방식'을 더 강조해 보세요. 훨씬 매력적으로 들릴 거예요!
                             </p>
                         </div>
@@ -156,23 +156,23 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                <div className="bg-white/40 backdrop-blur-3xl p-10 rounded-[40px] border border-white/70 shadow-xl flex flex-col justify-between">
-                    <div className="space-y-6">
+                <div className="bg-white/40 backdrop-blur-3xl p-12 rounded-[40px] border border-white/70 shadow-xl flex flex-col justify-between">
+                    <div className="space-y-8">
                         <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
-                                <Sparkles className="w-4 h-4 text-amber-600" />
+                            <div className="w-9 h-9 bg-amber-100 rounded-xl flex items-center justify-center">
+                                <Sparkles className="w-5 h-5 text-amber-600" />
                             </div>
                             <span className="text-sm font-black text-slate-800">오늘의 핵심 키워드</span>
                         </div>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap gap-3">
                             {['협업 중심', '데이터 기반', '문제 해결', '성과 도출', '성장 지향'].map(tag => (
-                                <span key={tag} className="px-4 py-2 bg-white rounded-2xl text-[11px] font-black text-slate-600 border border-slate-100 shadow-sm hover:border-amber-200 hover:text-amber-600 transition-colors cursor-default">
+                                <span key={tag} className="px-5 py-2.5 bg-white rounded-2xl text-[11px] font-black text-slate-600 border border-slate-100 shadow-sm hover:border-amber-200 hover:text-amber-600 transition-colors cursor-default">
                                     #{tag}
                                 </span>
                             ))}
                         </div>
                     </div>
-                    <div className="pt-6 border-t border-slate-100/50">
+                    <div className="pt-8 border-t border-slate-100/50">
                         <p className="text-[11px] font-bold text-slate-400 leading-relaxed italic">
                             "이 키워드들을 답변에 녹여내면 더 좋은 점수를 받을 수 있습니다."
                         </p>
@@ -202,10 +202,10 @@ export default function Dashboard() {
                         value={isEmpty ? "0" : "3"}
                         unit="일"
                     />
-                    <div className="bg-white/60 backdrop-blur-3xl p-8 rounded-[40px] border border-white/70 shadow-lg flex flex-col justify-between group hover:border-indigo-200 transition-all cursor-default">
-                        <CheckCircle2 className={`w-8 h-8 mb-4 ${isEmpty ? 'text-slate-300' : 'text-green-500'}`} />
+                    <div className="bg-white/60 backdrop-blur-3xl p-10 rounded-[40px] border border-white/70 shadow-lg flex flex-col justify-between group hover:border-indigo-200 transition-all cursor-default min-h-[180px]">
+                        <CheckCircle2 className={`w-9 h-9 mb-6 ${isEmpty ? 'text-slate-300' : 'text-green-500'}`} />
                         <div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Weekly Status</p>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Weekly Status</p>
                             <h4 className="text-xl font-black text-slate-800 leading-tight">
                                 {isEmpty ? "첫 면접을 시작하여 \n 목표를 달성하세요!" : (<>이번 주 목표의 <span className="text-indigo-600">85%</span>를 달성했습니다.</>)}
                             </h4>
@@ -214,18 +214,18 @@ export default function Dashboard() {
                 </div>
 
                 {/* Radar Chart */}
-                <div className={`w-full lg:w-[450px] bg-white/40 backdrop-blur-3xl p-10 rounded-[50px] border border-white/70 shadow-xl flex flex-col items-center justify-center order-1 lg:order-2 relative ${isEmpty ? 'grayscale-[0.5] opacity-80' : ''}`}>
-                    <div className="w-full flex justify-between items-center mb-6">
+                <div className={`w-full lg:w-[480px] bg-white/40 backdrop-blur-3xl p-12 rounded-[50px] border border-white/70 shadow-xl flex flex-col items-center justify-center order-1 lg:order-2 relative ${isEmpty ? 'grayscale-[0.5] opacity-80' : ''}`}>
+                    <div className="w-full flex justify-between items-center mb-8">
                         <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-                                <Target className="w-4 h-4 text-indigo-600" />
+                            <div className="w-9 h-9 bg-indigo-100 rounded-xl flex items-center justify-center">
+                                <Target className="w-5 h-5 text-indigo-600" />
                             </div>
                             <span className="text-sm font-black text-slate-800 tracking-tight">핵심 역량 프로필</span>
                         </div>
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">AI Analysis</span>
                     </div>
 
-                    <div className="w-full h-[280px]">
+                    <div className="w-full h-[320px]">
                         <ResponsiveContainer width="100%" height="100%">
                             <RadarChart cx="50%" cy="50%" outerRadius="80%" data={competencyData}>
                                 <PolarGrid stroke="#e2e8f0" strokeDasharray="3 3" />
@@ -248,14 +248,14 @@ export default function Dashboard() {
 
                     {isEmpty && (
                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/10 backdrop-blur-[2px] rounded-[50px] z-20">
-                            <div className="bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-2 scale-90 hover:scale-100 transition-transform cursor-default">
-                                <HelpCircle className="w-4 h-4" />
+                            <div className="bg-slate-900 text-white px-7 py-4 rounded-2xl shadow-2xl flex items-center gap-2 scale-90 hover:scale-100 transition-transform cursor-default">
+                                <HelpCircle className="w-5 h-5" />
                                 <span className="text-xs font-black uppercase tracking-widest">No Data Available</span>
                             </div>
                         </div>
                     )}
 
-                    <p className="mt-4 text-[11px] font-bold text-slate-400 text-center leading-relaxed">
+                    <p className="mt-8 text-[11px] font-bold text-slate-400 text-center leading-relaxed">
                         최근 분석 데이터를 기반으로 도출된<br />직무 특화 핵심 역량 지표입니다.
                     </p>
                 </div>
@@ -356,11 +356,11 @@ export default function Dashboard() {
 
 function StatCard({ icon, label, value, unit }: { icon: React.ReactNode, label: string, value: string | number, unit: string }) {
     return (
-        <div className="bg-white/40 backdrop-blur-3xl p-8 rounded-[40px] border border-white/60 shadow-[0_15px_30px_rgba(0,0,0,0.03)] flex flex-col items-center text-center gap-4 hover:bg-white/60 hover:-translate-y-1 transition-all flex-1">
-            <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-slate-50">
+        <div className="bg-white/40 backdrop-blur-3xl p-10 rounded-[40px] border border-white/60 shadow-[0_15px_30px_rgba(0,0,0,0.03)] flex flex-col items-center text-center gap-6 hover:bg-white/60 hover:-translate-y-1 transition-all flex-1 min-h-[220px] justify-center">
+            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-slate-50">
                 {icon}
             </div>
-            <div className="space-y-1">
+            <div className="space-y-2">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{label}</p>
                 <h4 className="text-4xl font-[1000] text-slate-900 tracking-tight">
                     {value}<span className="text-lg font-bold text-slate-400 ml-1">{unit}</span>

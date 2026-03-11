@@ -183,66 +183,75 @@ export default function JobCalendar() {
             {isModalOpen && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center px-6 py-10">
                     <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
-                    <div className="w-full max-w-lg bg-white rounded-[40px] shadow-2xl relative z-10 p-8 border border-white max-h-[90vh] overflow-y-auto animate-in zoom-in duration-300 scrollbar-hide">
+                    <div className="w-full max-w-3xl bg-white rounded-[60px] shadow-2xl relative z-10 p-16 pb-32 border border-white max-h-[95vh] overflow-y-auto animate-in zoom-in duration-500 scrollbar-hide">
                         <div className="absolute top-0 right-0 p-6">
                             <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 p-2"><X className="w-6 h-6" /></button>
                         </div>
 
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-4 border-b border-slate-50 pb-6 -mx-8 px-8">
-                                <div className="w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center">
-                                    <Bell className="text-indigo-600 w-6 h-6" />
+                        <div className="space-y-12">
+                            <div className="flex items-center gap-8 border-b border-slate-50 pb-12 -mx-16 px-16">
+                                <div className="w-20 h-20 bg-indigo-100 rounded-[30px] flex items-center justify-center shadow-inner">
+                                    <Bell className="text-indigo-600 w-10 h-10" />
                                 </div>
-                                <h3 className="text-2xl font-black text-slate-800 tracking-tight">새 일정 추가</h3>
+                                <div className="space-y-2">
+                                    <h3 className="text-4xl font-[1000] text-slate-900 tracking-tighter">새 일정 추가</h3>
+                                    <p className="text-lg font-bold text-slate-400">새로운 서류 마감 일정을 캘린더에 기록하세요</p>
+                                </div>
                             </div>
 
-                            <form onSubmit={handleAddJob} className="space-y-5">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">회사명</label>
+                            <form onSubmit={handleAddJob} className="space-y-12">
+                                <div className="space-y-4">
+                                    <label className="text-sm font-black text-slate-400 uppercase tracking-[0.4em] pl-2">회사명</label>
                                     <div className="relative group">
-                                        <Building2 className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-indigo-500 group-focus-within:scale-110 transition-all" />
+                                        <div className="absolute left-10 top-1/2 -translate-y-1/2 text-indigo-400 group-focus-within:text-indigo-600 transition-all z-10 pointer-events-none">
+                                            <Building2 className="w-8 h-8 group-focus-within:scale-125 transition-transform" />
+                                        </div>
                                         <input
                                             required
                                             type="text"
                                             placeholder="예: 구글 코리아"
-                                            className="w-full pl-16 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                            className="w-full pl-24 pr-10 py-8 bg-slate-50 border-2 border-slate-100 rounded-[35px] focus:ring-8 focus:ring-indigo-500/5 focus:border-indigo-500 outline-none text-xl font-bold text-slate-700 placeholder:text-slate-200 transition-all"
                                             value={newJob.company}
                                             onChange={(e) => setNewJob({ ...newJob, company: e.target.value })}
                                         />
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">모집 직무</label>
+                                <div className="space-y-4">
+                                    <label className="text-sm font-black text-slate-400 uppercase tracking-[0.4em] pl-2">모집 직무</label>
                                     <div className="relative group">
-                                        <Briefcase className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-indigo-500 group-focus-within:scale-110 transition-all" />
+                                        <div className="absolute left-10 top-1/2 -translate-y-1/2 text-indigo-400 group-focus-within:text-indigo-600 transition-all z-10 pointer-events-none">
+                                            <Briefcase className="w-8 h-8 group-focus-within:scale-125 transition-transform" />
+                                        </div>
                                         <input
                                             required
                                             type="text"
                                             placeholder="예: 신입 프런트엔드 개발자"
-                                            className="w-full pl-16 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                            className="w-full pl-24 pr-10 py-8 bg-slate-50 border-2 border-slate-100 rounded-[35px] focus:ring-8 focus:ring-indigo-500/5 focus:border-indigo-500 outline-none text-xl font-bold text-slate-700 placeholder:text-slate-200 transition-all"
                                             value={newJob.position}
                                             onChange={(e) => setNewJob({ ...newJob, position: e.target.value })}
                                         />
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">마감 날짜</label>
+                                <div className="space-y-4">
+                                    <label className="text-sm font-black text-slate-400 uppercase tracking-[0.4em] pl-2">마감 날짜</label>
                                     <div className="relative group">
-                                        <CalendarIcon className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-indigo-500 group-focus-within:scale-110 transition-all" />
+                                        <div className="absolute left-10 top-1/2 -translate-y-1/2 text-indigo-400 group-focus-within:text-indigo-600 transition-all z-10 pointer-events-none">
+                                            <CalendarIcon className="w-8 h-8 group-focus-within:scale-125 transition-transform" />
+                                        </div>
                                         <input
                                             required
                                             type="date"
-                                            className="w-full pl-16 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                            className="w-full pl-24 pr-10 py-8 bg-slate-50 border-2 border-slate-100 rounded-[35px] focus:ring-8 focus:ring-indigo-500/5 focus:border-indigo-500 outline-none text-xl font-bold text-slate-700 transition-all"
                                             value={newJob.deadline}
                                             onChange={(e) => setNewJob({ ...newJob, deadline: e.target.value })}
                                         />
                                     </div>
                                 </div>
 
-                                <div className="pt-6 pb-4">
-                                    <button type="submit" className="w-full py-5 bg-slate-900 text-white rounded-[26px] font-[1000] text-sm uppercase tracking-[0.3em] hover:bg-indigo-600 hover:shadow-2xl hover:shadow-indigo-200 transition-all active:scale-[0.98] shadow-xl shadow-slate-100">
+                                <div className="pt-12">
+                                    <button type="submit" className="w-full py-8 bg-slate-900 text-white rounded-[40px] font-[1000] text-2xl uppercase tracking-[0.5em] hover:bg-indigo-600 hover:shadow-[0_30px_60px_rgba(79,70,229,0.3)] transition-all active:scale-[0.97] shadow-2xl shadow-slate-200 group">
                                         일정 저장하기
                                     </button>
                                 </div>
