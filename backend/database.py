@@ -85,7 +85,7 @@ class DatabaseManager:
         if not self.client:
             return []
         try:
-            res = self.client.table("job_applications").select("*").order("deadline", descending=False).execute()
+            res = self.client.table("job_applications").select("*").order("deadline", desc=False).execute()
             return res.data
         except Exception as e:
             print(f"공고 조회 중 오류 발생: {e}")
