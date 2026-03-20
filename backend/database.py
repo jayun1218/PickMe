@@ -102,4 +102,17 @@ class DatabaseManager:
             print(f"공고 삭제 중 오류 발생: {e}")
             return False
 
+    async def update_job_application(self, app_id: str, data: dict):
+        """특정 지원 공고 정보를 수정합니다."""
+        if not self.client:
+            return None
+        try:
+            res = self.client.table("job_applications").update(data).eq("id", app_id).execute()
+            if len(res.data) > 0:
+                return res.data[0]
+            return None
+        except Exception as e:
+            print(f"공고 수정 중 오류 발생: {e}")
+            return None
+
 db_manager = DatabaseManager()

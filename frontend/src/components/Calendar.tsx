@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, X, Briefcase, Building2, Bell } from 'lucide-react';
-import { getJobs, addJob, deleteJob } from '@/lib/api';
+import { getJobs, addJob, deleteJob, updateJob } from '@/lib/api';
 
 interface Job {
     id: string;
@@ -17,6 +17,7 @@ export default function JobCalendar() {
     const [jobs, setJobs] = useState<Job[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [editingJobId, setEditingJobId] = useState<string | null>(null);
 
     // New job form state
     const [newJob, setNewJob] = useState({
@@ -25,6 +26,12 @@ export default function JobCalendar() {
         deadline: '',
         notes: ''
     });
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setEditingJobId(null);
+        setNewJob({ company: '', position: '', deadline: '', notes: '' });
+    };
 
     useEffect(() => {
         fetchJobs();
@@ -44,12 +51,15 @@ export default function JobCalendar() {
     const handleAddJob = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await addJob(newJob);
-            setIsModalOpen(false);
-            setNewJob({ company: '', position: '', deadline: '', notes: '' });
+            if (editingJobId) {
+                await updateJob(editingJobId, newJob);
+            } else {
+                await addJob(newJob);
+            }
+            closeModal();
             fetchJobs();
         } catch (error) {
-            console.error("Failed to add job:", error);
+            console.error("Failed to save job:", error);
             alert("저장에 실패했습니다.");
         }
     };
@@ -120,7 +130,11 @@ export default function JobCalendar() {
                 </div>
 
                 <button
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={() => {
+                        setEditingJobId(null);
+                        setNewJob({ company: '', position: '', deadline: '', notes: '' });
+                        setIsModalOpen(true);
+                    }}
                     className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl font-bold text-sm hover:bg-slate-800 hover:scale-105 transition-all shadow-xl"
                 >
                     <Plus className="w-4 h-4" /> 일정 추가하기
@@ -159,7 +173,17 @@ export default function JobCalendar() {
                                             {dayJobs.map(job => (
                                                 <div
                                                     key={job.id}
-                                                    className="group/item relative px-2.5 py-1.5 bg-indigo-600 text-white text-[10px] rounded-lg font-bold shadow-md shadow-indigo-200 cursor-default hover:scale-105 transition-transform"
+                                                    onClick={() => {
+                                                        setEditingJobId(job.id);
+                                                        setNewJob({
+                                                            company: job.company,
+                                                            position: job.position,
+                                                            deadline: job.deadline,
+                                                            notes: job.notes || ''
+                                                        });
+                                                        setIsModalOpen(true);
+                                                    }}
+                                                    className="group/item relative px-2.5 py-1.5 bg-indigo-600 text-white text-[10px] rounded-lg font-bold shadow-md shadow-indigo-200 cursor-pointer hover:scale-105 transition-transform"
                                                 >
                                                     <div className="truncate w-full">{job.company}</div>
                                                     <button
@@ -182,10 +206,10 @@ export default function JobCalendar() {
             {/* Modal for adding job */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center px-6 py-10">
-                    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
+                    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={closeModal}></div>
                     <div className="w-full max-w-3xl bg-white rounded-[60px] shadow-2xl relative z-10 p-16 pb-32 border border-white max-h-[95vh] overflow-y-auto animate-in zoom-in duration-500 scrollbar-hide">
                         <div className="absolute top-0 right-0 p-6">
-                            <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 p-2"><X className="w-6 h-6" /></button>
+                            <button onClick={closeModal} className="text-slate-400 hover:text-slate-600 p-2"><X className="w-6 h-6" /></button>
                         </div>
 
                         <div className="space-y-12">
@@ -194,8 +218,8 @@ export default function JobCalendar() {
                                     <Bell className="text-indigo-600 w-10 h-10" />
                                 </div>
                                 <div className="space-y-2">
-                                    <h3 className="text-4xl font-[1000] text-slate-900 tracking-tighter">새 일정 추가</h3>
-                                    <p className="text-lg font-bold text-slate-400">새로운 서류 마감 일정을 캘린더에 기록하세요</p>
+                                    <h3 className="text-4xl font-[1000] text-slate-900 tracking-tighter">{editingJobId ? '일정 수정' : '새 일정 추가'}</h3>
+                                    <p className="text-lg font-bold text-slate-400">{editingJobId ? '등록된 마감 일정을 수정하세요' : '새로운 서류 마감 일정을 캘린더에 기록하세요'}</p>
                                 </div>
                             </div>
 
@@ -252,7 +276,7 @@ export default function JobCalendar() {
 
                                 <div className="pt-12">
                                     <button type="submit" className="w-full py-8 bg-slate-900 text-white rounded-[40px] font-[1000] text-2xl uppercase tracking-[0.5em] hover:bg-indigo-600 hover:shadow-[0_30px_60px_rgba(79,70,229,0.3)] transition-all active:scale-[0.97] shadow-2xl shadow-slate-200 group">
-                                        일정 저장하기
+                                        {editingJobId ? '일정 수정하기' : '일정 저장하기'}
                                     </button>
                                 </div>
                             </form>

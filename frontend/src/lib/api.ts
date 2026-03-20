@@ -100,3 +100,8 @@ export const deleteJob = async (appId: string) => {
     const response = await api.delete(`/api/v1/jobs/${appId}`);
     return response.data;
 };
+
+export const updateJob = async (appId: string, jobData: { company: string; position: string; deadline: string; notes?: string }) => {
+    const response = await api.put(`/api/v1/jobs/${appId}`, jobData);
+    return response.data;
+};

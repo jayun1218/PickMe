@@ -240,6 +240,17 @@ async def delete_job_application(app_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.put("/api/v1/jobs/{app_id}")
+async def update_job_application(app_id: str, job: JobApplication):
+    try:
+        from database import db_manager
+        result = await db_manager.update_job_application(app_id, job.dict())
+        if not result:
+            raise HTTPException(status_code=500, detail="수정에 실패했습니다.")
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/api/v1/interview/stt")
 async def transcribe_voice(file: UploadFile = File(...)):
     try:
