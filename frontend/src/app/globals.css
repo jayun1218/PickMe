@@ -30,6 +30,7 @@ body {
   background-color: var(--color-bg-main);
   color: #0F172A;
   overflow-x: hidden;
+  width: 100vw;
   -webkit-font-smoothing: antialiased;
   transition: background-color 0.4s ease, color 0.4s ease;
 }
@@ -160,6 +161,14 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #CBD5E1;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 /* Gradient Text */

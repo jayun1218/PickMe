@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Calendar, BarChart3, ArrowRight, Clock, Sparkles, TrendingUp, Award, Zap, Loader2, Target, Heart, CheckCircle2, AlertCircle, HelpCircle, Briefcase, ExternalLink, Info, X } from 'lucide-react';
-import { getInterviewHistory, getJobs, getJobGuide } from '@/lib/api';
+import { Calendar, BarChart3, ArrowRight, Clock, Sparkles, TrendingUp, Award, Zap, Loader2, Target, Heart, CheckCircle2, AlertCircle, HelpCircle } from 'lucide-react';
+import { getInterviewHistory, getJobs } from '@/lib/api';
 import {
     Radar,
     RadarChart,
@@ -17,8 +17,6 @@ export default function Dashboard() {
     const [isLoading, setIsLoading] = useState(true);
     const [dDayInfo, setDDayInfo] = useState<{ days: string | number, company: string } | null>(null);
     const [urgentAlerts, setUrgentAlerts] = useState<{ company: string; type: string; diffDays: number }[]>([]);
-    const [selectedGuide, setSelectedGuide] = useState<any>(null);
-    const [isGuideLoading, setIsGuideLoading] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -130,19 +128,6 @@ export default function Dashboard() {
                 fullMark: 100
             };
         });
-    };
-
-    const handleViewGuide = async (job: any) => {
-        setIsGuideLoading(true);
-        try {
-            const guide = await getJobGuide(job.company, job.position, job.notes);
-            setSelectedGuide({ ...guide, company: job.company });
-        } catch (error) {
-            console.error(error);
-            alert("가이드를 생성하지 못했습니다.");
-        } finally {
-            setIsGuideLoading(false);
-        }
     };
 
     if (isLoading) {
@@ -414,137 +399,7 @@ export default function Dashboard() {
                         ))}
                     </div>
                 )}
-
-                {/* Upcoming Public Enterprise Section */}
-                <div className="mt-32 space-y-12 mb-20">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-6">
-                            <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-200">
-                                <Briefcase className="w-8 h-8" />
-                            </div>
-                            <div className="space-y-1">
-                                <h2 className="text-3xl font-[1000] text-slate-800 tracking-tight">공기업 채용 리스트</h2>
-                                <p className="text-slate-500 font-bold text-base">실시간 동기화된 마감 임박 공고</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                        {jobs.filter(j => j.category !== "기타" || j.notes?.includes("ALIO")).slice(0, 6).map((job, idx) => (
-                            <div key={idx} className="bg-white/60 backdrop-blur-3xl border border-white/80 rounded-xl p-8 hover:shadow-2xl hover:shadow-indigo-100/50 hover:-translate-y-2 transition-all duration-500 group relative overflow-hidden flex flex-col justify-between h-full">
-                                <div className="space-y-6">
-                                    <div className="flex items-center justify-between gap-3">
-                                        <span className="px-4 py-1.5 bg-indigo-50 text-indigo-600 text-[10px] font-black rounded-lg uppercase tracking-tighter border border-indigo-100/50">
-                                            {job.category || "공기업"}
-                                        </span>
-                                        <div className="flex items-center gap-2 text-white font-black text-[12px] bg-red-600 px-3 py-1.5 rounded-lg shadow-lg shadow-red-200/50 flex-shrink-0 whitespace-nowrap">
-                                            <Clock className="w-3.5 h-3.5" />
-                                            {(() => {
-                                                const diff = Math.ceil((new Date(job.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-                                                return diff === 0 ? "D-Day" : `D-${Math.abs(diff)}`;
-                                            })()}
-                                        </div>
-                                    </div>
-                                    <div className="space-y-3">
-                                        <h3 className="text-xl font-black text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">{job.company}</h3>
-                                        <p className="text-sm font-bold text-slate-500 line-clamp-2 md:h-10 leading-relaxed">{job.position}</p>
-                                    </div>
-                                </div>
-
-                                <div className="mt-8 flex items-center gap-3">
-                                    <a
-                                        href={job.url || "https://www.alio.go.kr"}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex-1 py-4 bg-slate-900 text-white rounded-xl text-xs font-black flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-lg"
-                                    >
-                                        지원하기 <ExternalLink className="w-3.5 h-3.5" />
-                                    </a>
-                                    <button
-                                        onClick={() => handleViewGuide(job)}
-                                        className="flex-1 py-4 bg-white border border-slate-200 text-slate-600 rounded-xl text-xs font-black flex items-center justify-center gap-2 hover:bg-slate-50 transition-all shadow-sm"
-                                    >
-                                        준비 가이드 <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
             </div>
-
-            {/* AI Guide Modal */}
-            {selectedGuide && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-300">
-                    <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in duration-300 border border-white/50">
-                        <div className="px-10 py-8 bg-gradient-to-r from-indigo-600 to-purple-600 text-white flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-md">
-                                    <Sparkles className="w-6 h-6" />
-                                </div>
-                                <div>
-                                    <h3 className="text-xl font-black tracking-tight">{selectedGuide.company}</h3>
-                                    <p className="text-[10px] uppercase font-black opacity-70 tracking-widest text-indigo-100">AI Preparation Guide</p>
-                                </div>
-                            </div>
-                            <button onClick={() => setSelectedGuide(null)} className="p-2 hover:bg-white/20 rounded-full transition-all">
-                                <X className="w-6 h-6" />
-                            </button>
-                        </div>
-                        <div className="p-10 space-y-10 max-h-[70vh] overflow-y-auto scrollbar-hide">
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-1.5 h-6 bg-indigo-500 rounded-full"></div>
-                                    <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest">기업 인재상 핵심 요약</h4>
-                                </div>
-                                <div className="p-6 bg-indigo-50/50 rounded-2xl border border-indigo-100 text-slate-700 font-bold leading-relaxed">
-                                    {selectedGuide.company_trait}
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-3">
-                                        <Info className="w-5 h-5 text-purple-500" />
-                                        <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">자소서 중점 사항</h4>
-                                    </div>
-                                    <p className="text-sm text-slate-500 font-bold leading-relaxed bg-slate-50 p-6 rounded-2xl border border-slate-100 min-h-[150px]">
-                                        {selectedGuide.resume_focus}
-                                    </p>
-                                </div>
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-3">
-                                        <Target className="w-5 h-5 text-indigo-500" />
-                                        <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">면접 준비 포인트</h4>
-                                    </div>
-                                    <p className="text-sm text-slate-500 font-bold leading-relaxed bg-slate-50 p-6 rounded-2xl border border-slate-100 min-h-[150px]">
-                                        {selectedGuide.interview_focus}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="px-10 py-8 bg-slate-50 border-t border-slate-100">
-                            <button
-                                onClick={() => setSelectedGuide(null)}
-                                className="w-full py-4 bg-slate-900 text-white rounded-xl text-sm font-black shadow-xl shadow-slate-200"
-                            >
-                                가이드 닫기
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Guide Loading Overlay */}
-            {isGuideLoading && (
-                <div className="fixed inset-0 z-[300] bg-white/60 backdrop-blur-md flex flex-col items-center justify-center gap-6 animate-in fade-in duration-300">
-                    <div className="w-16 h-16 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
-                    <div className="text-center space-y-2">
-                        <p className="text-xl font-black text-slate-800">AI 분석 리포트 생성 중...</p>
-                        <p className="text-sm font-bold text-slate-400">기업의 최신 인재상과 요구 역량을 분석하고 있습니다.</p>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
