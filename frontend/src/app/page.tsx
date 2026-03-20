@@ -25,12 +25,35 @@ export default function HomePage() {
     const [mode, setMode] = useState<ViewMode>("simple"); // Using ViewMode type
     const [isPressureMode, setIsPressureMode] = useState(false);
     const [targetCompany, setTargetCompany] = useState<string>("");
+    const [isDarkMode, setIsDarkMode] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
         window.addEventListener("scroll", handleScroll);
+        
+        // Load dark mode preference
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            setIsDarkMode(true);
+            document.documentElement.classList.add('dark');
+        } else {
+            setIsDarkMode(false);
+            document.documentElement.classList.remove('dark');
+        }
+
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    const toggleDarkMode = () => {
+        if (isDarkMode) {
+            document.documentElement.classList.remove('dark');
+            localStorage.theme = 'light';
+            setIsDarkMode(false);
+        } else {
+            document.documentElement.classList.add('dark');
+            localStorage.theme = 'dark';
+            setIsDarkMode(true);
+        }
+    };
 
     const handleAnalysisComplete = (data: any) => {
         setAnalysisResult(data);
@@ -58,7 +81,7 @@ export default function HomePage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#FAFBFF] text-slate-900 selection:bg-indigo-200/50 relative">
+        <div className="min-h-screen text-slate-900 dark:text-slate-100 selection:bg-indigo-200/50 relative transition-colors duration-500">
             {/* Ambient Background Glows */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
                 <div className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] rounded-full bg-indigo-400/20 blur-[140px] mix-blend-multiply animate-float-slow"></div>
@@ -69,7 +92,7 @@ export default function HomePage() {
             {/* Premium Floating Navigation */}
             <nav className={`fixed top-0 left-0 w-full z-[100] transition-all duration-500 px-6 pt-6 flex justify-center ${scrolled ? "pt-4" : "pt-8"
                 }`}>
-                <div className="w-full max-w-[1400px] glass-effect rounded-[28px] px-12 h-20 flex items-center justify-center border border-white/60 shadow-xl shadow-indigo-900/5 relative overflow-hidden">
+                <div className="w-full max-w-[1400px] glass-effect rounded-3xl px-12 h-20 flex items-center justify-center border border-white/60 shadow-xl shadow-indigo-900/5 relative overflow-hidden">
                     <div className="absolute inset-0 bg-white/40 backdrop-blur-xl -z-10"></div>
                     <div
                         onClick={() => {
@@ -84,12 +107,12 @@ export default function HomePage() {
                         <div className="w-10 h-10 bg-gradient-premium rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200 group-hover:rotate-6 transition-transform">
                             <Sparkles className="text-white w-6 h-6" />
                         </div>
-                        <span className="text-2xl font-[900] tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600">
+                        <span className="text-2xl font-[900] tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400">
                             PickMe
                         </span>
                     </div>
 
-                    <div className="hidden md:flex items-center gap-14 text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                    <div className="hidden md:flex items-center gap-14 text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">
                         <Link href="/" onClick={() => setMode("simple")} className="hover:text-indigo-600 transition-colors">Platform</Link>
                         <button
                             onClick={() => setMode("dashboard")}
@@ -105,9 +128,17 @@ export default function HomePage() {
                         </button>
                         <button
                             onClick={() => setMode("coaching")}
-                            className={`hover:text-indigo-600 transition-colors flex items-center gap-2 ${mode === "coaching" ? "text-indigo-600" : ""}`}
+                            className={`hover:text-indigo-600 transition-colors flex items-center gap-2 ${mode === "coaching" ? "text-indigo-600 dark:text-indigo-400" : ""}`}
                         >
                             Resume Coaching
+                        </button>
+                        
+                        {/* Dark Mode Toggle */}
+                        <button
+                            onClick={toggleDarkMode}
+                            className="w-8 h-8 rounded-full flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-indigo-600 transition-colors"
+                        >
+                            {isDarkMode ? '🌙' : '🌞'}
                         </button>
                     </div>
                 </div>
@@ -190,10 +221,10 @@ export default function HomePage() {
                             {mode !== "coaching" && mode !== "dashboard" && mode !== "calendar" && ( // Exclude calendar mode
                                 <div className="flex flex-col items-center gap-6">
                                     {/* Mode Switching Tabs */}
-                                    <div className="flex bg-slate-200/50 p-1.5 rounded-[28px] border border-slate-200 backdrop-blur-md shadow-inner">
+                                    <div className="flex bg-slate-200/50 p-1.5 rounded-3xl border border-slate-200 backdrop-blur-md shadow-inner">
                                         <button
                                             onClick={() => setMode("simple")}
-                                            className={`relative min-w-[220px] px-12 py-4 rounded-[22px] text-[13px] font-black uppercase tracking-widest transition-all duration-300 ${mode === "simple"
+                                            className={`relative min-w-[220px] px-12 py-4 rounded-2xl text-[13px] font-black uppercase tracking-widest transition-all duration-300 ${mode === "simple"
                                                 ? "bg-white text-indigo-600 shadow-2xl shadow-indigo-200/50 scale-100"
                                                 : "text-slate-400 hover:text-slate-600 scale-95"
                                                 }`}
@@ -202,7 +233,7 @@ export default function HomePage() {
                                         </button>
                                         <button
                                             onClick={() => setMode("combined")}
-                                            className={`relative min-w-[220px] px-12 py-4 rounded-[22px] text-[13px] font-black uppercase tracking-widest transition-all duration-300 ${mode === "combined"
+                                            className={`relative min-w-[220px] px-12 py-4 rounded-2xl text-[13px] font-black uppercase tracking-widest transition-all duration-300 ${mode === "combined"
                                                 ? "bg-white text-indigo-600 shadow-2xl shadow-indigo-200/50 scale-100"
                                                 : "text-slate-400 hover:text-slate-600 scale-95"
                                                 }`}
@@ -273,7 +304,7 @@ export default function HomePage() {
 
                                 <div className="flex flex-wrap flex-col md:flex-row items-end md:items-center gap-4">
                                     {/* Target Company Input */}
-                                    <div className="flex items-center gap-2 bg-white/40 backdrop-blur-2xl p-2 px-6 rounded-[20px] border border-white/60 shadow-sm">
+                                    <div className="flex items-center gap-2 bg-white/40 backdrop-blur-2xl p-2 px-6 rounded-2xl border border-white/60 shadow-sm">
                                         <span className="text-[10px] font-black text-indigo-600 uppercase tracking-tighter pr-3 border-r border-indigo-100">Target</span>
                                         <input 
                                             type="text" 
@@ -285,7 +316,7 @@ export default function HomePage() {
                                     </div>
 
                                     {/* Pressure Mode Toggle */}
-                                    <div className="flex items-center gap-4 bg-white/40 backdrop-blur-2xl p-2 pl-6 rounded-[20px] border border-white/60 shadow-sm group">
+                                    <div className="flex items-center gap-4 bg-white/40 backdrop-blur-2xl p-2 pl-6 rounded-2xl border border-white/60 shadow-sm group">
                                         <div className="flex flex-col">
                                             <span className="text-[10px] font-black text-slate-900 uppercase tracking-tighter">Pressure Mode</span>
                                             <span className="text-[9px] font-bold text-slate-400">심층 꼬리 질문 활성화</span>
@@ -316,7 +347,7 @@ export default function HomePage() {
 
                             {/* Resume Coaching Section (If available) */}
                             {analysisResult.resume_coaching && (
-                                <div className="mb-20 p-10 rounded-[45px] bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 shadow-xl shadow-indigo-100/30 overflow-hidden relative">
+                                <div className="mb-20 p-10 rounded-3xl bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 shadow-xl shadow-indigo-100/30 overflow-hidden relative">
                                     <div className="relative z-10">
                                         <div className="flex items-center gap-3 mb-6">
                                             <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center">
@@ -379,7 +410,7 @@ export default function HomePage() {
 
 function FeatureItem({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
     return (
-        <div className="py-12 px-12 min-h-[200px] h-full rounded-[28px] bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-3xl border border-white/20 shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_20px_40px_rgba(79,70,229,0.12)] hover:-translate-y-2 hover:from-white/30 hover:to-white/10 transition-all duration-500 group text-center relative overflow-hidden flex flex-col items-center">
+        <div className="py-12 px-12 min-h-[200px] h-full rounded-3xl bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-3xl border border-white/20 shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_20px_40px_rgba(79,70,229,0.12)] hover:-translate-y-2 hover:from-white/30 hover:to-white/10 transition-all duration-500 group text-center relative overflow-hidden flex flex-col items-center">
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div className="relative z-10 flex flex-col items-center text-center h-full justify-center">
                 <div className="w-16 h-16 bg-white/40 backdrop-blur-xl rounded-2xl flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-500 mb-10 shadow-inner border border-white/50 group-hover:border-indigo-600 mx-auto">
@@ -400,11 +431,11 @@ function PracticeCard({ item, onStart }: { item: any, onStart: () => void }) {
     return (
         <button
             onClick={onStart}
-            className="p-8 bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-3xl border border-white/20 rounded-[24px] hover:border-indigo-300 hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-1 hover:from-white/30 hover:to-white/10 transition-all duration-300 group text-left flex items-center justify-between gap-6 relative overflow-hidden"
+            className="p-8 bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-3xl border border-white/20 rounded-2xl hover:border-indigo-300 hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-1 hover:from-white/30 hover:to-white/10 transition-all duration-300 group text-left flex items-center justify-between gap-6 relative overflow-hidden"
         >
             <div className="absolute inset-0 bg-gradient-to-r from-indigo-50/0 via-indigo-50/30 to-indigo-50/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
             <div className="flex items-start gap-6 relative z-10">
-                <div className="mt-1 w-14 h-14 bg-slate-50 text-slate-500 rounded-[22px] flex items-center justify-center text-xl font-black group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300 shadow-sm border border-slate-100 group-hover:border-indigo-600 shrink-0">
+                <div className="mt-1 w-14 h-14 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center text-xl font-black group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300 shadow-sm border border-slate-100 group-hover:border-indigo-600 shrink-0">
                     {item.id}
                 </div>
                 <div className="space-y-2">

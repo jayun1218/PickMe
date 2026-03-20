@@ -111,3 +111,42 @@ export const syncAlioJobs = async (category: string = "전체") => {
     const response = await api.post(url);
     return response.data;
 };
+
+// --- 다중 이력서 프로필 ---
+export const saveUserResume = async (user_id: string, filename: string, content: string) => {
+    const response = await api.post('/api/v1/resumes', { user_id, filename, content });
+    return response.data;
+};
+
+export const getUserResumes = async (user_id: string) => {
+    const response = await api.get(`/api/v1/resumes/${user_id}`);
+    return response.data;
+};
+
+export const analyzeResumeText = async (resume_text: string) => {
+    const response = await api.post('/api/v1/resume/analyze-text', { resume_text });
+    return response.data;
+};
+
+// --- 질문 스크랩 (오답노트) ---
+export const saveScrappedQuestion = async (user_id: string, question: string, company_name?: string) => {
+    const response = await api.post('/api/v1/scrap', { user_id, question, company_name });
+    return response.data;
+};
+
+export const getScrappedQuestions = async (user_id: string) => {
+    const response = await api.get(`/api/v1/scrap/${user_id}`);
+    return response.data;
+};
+
+export const deleteScrappedQuestion = async (question_id: string) => {
+    const response = await api.delete(`/api/v1/scrap/${question_id}`);
+    return response.data;
+};
+
+export const getJobGuide = async (company: string, position?: string, notes?: string) => {
+    const response = await api.post('/api/v1/jobs/guide', { company, position, notes });
+    return response.data;
+};
+
+

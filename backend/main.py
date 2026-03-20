@@ -11,6 +11,7 @@ from services.feedback_service import FeedbackService
 from services.stt_service import STTService
 from services.scraping_service import ScrapingService
 from services.alio_service import AlioService
+from services.guide_service import GuideService
 
 load_dotenv()
 
@@ -21,6 +22,7 @@ feedback_service = FeedbackService()
 stt_service = STTService()
 scraping_service = ScrapingService()
 alio_service = AlioService()
+guide_service = GuideService()
 
 # API 데이터 모델
 class ChatMessage(BaseModel):
@@ -47,7 +49,23 @@ class JobApplication(BaseModel):
     first_interview_date: Optional[str] = None
     second_interview_date: Optional[str] = None
     category: Optional[str] = None
+    url: Optional[str] = None
     notes: Optional[str] = None
+
+class JobGuideRequest(BaseModel):
+    company: str
+    position: Optional[str] = None
+    notes: Optional[str] = None
+
+class ResumeSaveRequest(BaseModel):
+    user_id: str
+    filename: str
+    content: str
+
+class ScrapRequest(BaseModel):
+    user_id: str
+    question: str
+    company_name: Optional[str] = None
 
 # CORS 설정
 app.add_middleware(
@@ -86,7 +104,8 @@ async def analyze_resume(file: UploadFile = File(...)):
 
         return {
             "filename": file.filename,
-            "questions": questions
+            "questions": questions,
+            "content": text
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -94,6 +113,40 @@ async def analyze_resume(file: UploadFile = File(...)):
         # 임시 파일 삭제
         if os.path.exists(temp_path):
             os.remove(temp_path)
+
+@app.post("/api/v1/resumes")
+async def save_resume_profile(req: ResumeSaveRequest):
+    from database import db_manager
+    res = await db_manager.save_user_resume(req.user_id, req.filename, req.content)
+    if not res:
+        raise HTTPException(status_code=500, detail="Failed to save resume")
+    return res
+
+@app.get("/api/v1/resumes/{user_id}")
+async def get_resume_profiles(user_id: str):
+    from database import db_manager
+    return await db_manager.get_user_resumes(user_id)
+
+@app.post("/api/v1/scrap")
+async def scrap_question(req: ScrapRequest):
+    from database import db_manager
+    res = await db_manager.save_scrapped_question(req.user_id, req.question, req.company_name)
+    if not res:
+        raise HTTPException(status_code=500, detail="Failed to scrap question")
+    return res
+
+@app.get("/api/v1/scrap/{user_id}")
+async def get_scraps(user_id: str):
+    from database import db_manager
+    return await db_manager.get_scrapped_questions(user_id)
+
+@app.delete("/api/v1/scrap/{question_id}")
+async def delete_scrap(question_id: str):
+    from database import db_manager
+    success = await db_manager.delete_scrapped_question(question_id)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to delete scrap")
+    return {"status": "success"}
 
 @app.post("/api/v1/resume/extract")
 async def extract_resume_text(file: UploadFile = File(...)):
@@ -114,6 +167,20 @@ async def extract_resume_text(file: UploadFile = File(...)):
     finally:
         if os.path.exists(temp_path):
             os.remove(temp_path)
+
+class ResumeAnalyzeTextRequest(BaseModel):
+    resume_text: str
+
+@app.post("/api/v1/resume/analyze-text")
+async def analyze_resume_text(req: ResumeAnalyzeTextRequest):
+    try:
+        questions = await resume_service.generate_interview_questions(req.resume_text)
+        return {
+            "questions": questions,
+            "content": req.resume_text
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/v1/analyze/combined")
 async def analyze_combined(resume: UploadFile = File(...), notice: UploadFile = File(...)):
@@ -264,17 +331,32 @@ async def sync_alio_jobs(category: Optional[str] = None):
         if category and category != "전체":
             jobs = [j for j in jobs if j.get("category") == category]
             
+        import asyncio
         from database import db_manager
         
+        # 병렬로 중복 여부 확인
+        check_tasks = [db_manager.check_job_exists(job["company"], job["position"]) for job in jobs]
+        exists_results = await asyncio.gather(*check_tasks)
+        
+        # 존재하지 않는 공고만 선별
+        new_jobs = [job for job, exists in zip(jobs, exists_results) if not exists]
+        
         added_count = 0
-        for job in jobs:
-            exists = await db_manager.check_job_exists(job["company"], job["position"])
-            if not exists:
-                res = await db_manager.save_job_application(job)
-                if res:
-                    added_count += 1
+        if new_jobs:
+            # 병렬로 저장
+            save_tasks = [db_manager.save_job_application(job) for job in new_jobs]
+            save_results = await asyncio.gather(*save_tasks)
+            added_count = len([r for r in save_results if r])
                 
         return {"status": "success", "fetched": len(jobs), "added": added_count}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/v1/jobs/guide")
+async def get_job_guide(request: JobGuideRequest):
+    try:
+        guide = await guide_service.generate_company_guide(request.company, request.position, request.notes)
+        return guide
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

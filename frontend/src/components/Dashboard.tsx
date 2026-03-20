@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Calendar, BarChart3, ArrowRight, Clock, Sparkles, TrendingUp, Award, Zap, Loader2, Target, Heart, CheckCircle2, AlertCircle, HelpCircle } from 'lucide-react';
-import { getInterviewHistory, getJobs } from '@/lib/api';
+import { Calendar, BarChart3, ArrowRight, Clock, Sparkles, TrendingUp, Award, Zap, Loader2, Target, Heart, CheckCircle2, AlertCircle, HelpCircle, Briefcase, ExternalLink, Info, X } from 'lucide-react';
+import { getInterviewHistory, getJobs, getJobGuide } from '@/lib/api';
 import {
     Radar,
     RadarChart,
@@ -17,6 +17,8 @@ export default function Dashboard() {
     const [isLoading, setIsLoading] = useState(true);
     const [dDayInfo, setDDayInfo] = useState<{ days: string | number, company: string } | null>(null);
     const [urgentAlerts, setUrgentAlerts] = useState<{ company: string; type: string; diffDays: number }[]>([]);
+    const [selectedGuide, setSelectedGuide] = useState<any>(null);
+    const [isGuideLoading, setIsGuideLoading] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -69,14 +71,7 @@ export default function Dashboard() {
                     if (futureJobs.length > 0) {
                         const closest = futureJobs[0];
                         const days = Math.ceil(closest.diff / (1000 * 60 * 60 * 24));
-                        let displayDays = '';
-                        if (days < 0) {
-                            displayDays = `+${Math.abs(days)}`;
-                        } else if (days === 0) {
-                            displayDays = '-DAY';
-                        } else {
-                            displayDays = `-${days}`;
-                        }
+                        const displayDays = days === 0 ? "Day" : (days > 0 ? `-${days}` : `+${Math.abs(days)}`);
                         setDDayInfo({ days: displayDays, company: closest.company });
                     }
                 }
@@ -137,6 +132,19 @@ export default function Dashboard() {
         });
     };
 
+    const handleViewGuide = async (job: any) => {
+        setIsGuideLoading(true);
+        try {
+            const guide = await getJobGuide(job.company, job.position, job.notes);
+            setSelectedGuide({ ...guide, company: job.company });
+        } catch (error) {
+            console.error(error);
+            alert("가이드를 생성하지 못했습니다.");
+        } finally {
+            setIsGuideLoading(false);
+        }
+    };
+
     if (isLoading) {
         return (
             <div className="py-40 flex flex-col items-center gap-8 animate-in fade-in duration-500">
@@ -157,7 +165,7 @@ export default function Dashboard() {
             {urgentAlerts.length > 0 && (
                 <div className="flex flex-col gap-4 animate-in slide-in-from-top-4 duration-500 w-full">
                     {urgentAlerts.map((alert, idx) => (
-                        <div key={idx} className="bg-red-500/10 border-2 border-red-500/50 rounded-3xl p-6 flex flex-col md:flex-row text-red-600 shadow-xl shadow-red-500/10 items-center justify-between gap-4">
+                        <div key={idx} className="bg-red-500/10 border-2 border-red-500/50 rounded-2xl p-6 flex flex-col md:flex-row text-red-600 shadow-xl shadow-red-500/10 items-center justify-between gap-4">
                             <div className="flex items-center gap-5 w-full">
                                 <div className="bg-red-500 text-white p-3 rounded-2xl animate-pulse shrink-0 shadow-lg shadow-red-500/30">
                                     <AlertCircle className="w-8 h-8" />
@@ -179,7 +187,7 @@ export default function Dashboard() {
 
             {/* Mental Care & D-Day Banner */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-                <div className="lg:col-span-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-[40px] px-12 py-16 lg:px-16 lg:py-24 text-white shadow-2xl shadow-indigo-200 relative overflow-hidden group min-h-[400px] flex items-center justify-center">
+                <div className="lg:col-span-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl px-12 py-16 lg:px-16 lg:py-24 text-white shadow-2xl shadow-indigo-200 relative overflow-hidden group min-h-[400px] flex items-center justify-center">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl group-hover:scale-110 transition-transform duration-1000"></div>
                     <div className="relative z-10 flex flex-col items-center justify-center gap-12 lg:gap-16 h-full w-full py-6">
                         <div className="space-y-6 text-center max-w-lg mx-auto flex flex-col items-center">
@@ -195,7 +203,7 @@ export default function Dashboard() {
                             </p>
                         </div>
                         {dDayInfo ? (
-                            <div className="flex flex-col items-center justify-center bg-white/10 backdrop-blur-xl rounded-[36px] px-16 py-10 border border-white/20 shrink-0 shadow-lg min-w-[240px]">
+                            <div className="flex flex-col items-center justify-center bg-white/10 backdrop-blur-xl rounded-3xl px-16 py-10 border border-white/20 shrink-0 shadow-lg min-w-[240px]">
                                 <span className="text-sm font-[900] uppercase tracking-[0.2em] opacity-80 mb-3 text-indigo-100">D-DAY</span>
                                 <span className="text-6xl md:text-7xl font-[900] tracking-tighter mb-5 text-white">D{dDayInfo.days}</span>
                                 <span className="text-sm font-[900] bg-white text-indigo-600 px-5 py-2 rounded-xl shadow-sm tracking-wide">
@@ -203,7 +211,7 @@ export default function Dashboard() {
                                 </span>
                             </div>
                         ) : (
-                            <div className="flex flex-col items-center justify-center bg-white/10 backdrop-blur-xl rounded-[36px] px-16 py-10 border border-white/20 shrink-0 shadow-sm opacity-90 min-w-[240px]">
+                            <div className="flex flex-col items-center justify-center bg-white/10 backdrop-blur-xl rounded-3xl px-16 py-10 border border-white/20 shrink-0 shadow-sm opacity-90 min-w-[240px]">
                                 <AlertCircle className="w-8 h-8 mb-3 opacity-50 text-white" />
                                 <span className="text-center text-xs font-[800] opacity-80 text-white leading-relaxed">
                                     등록된 일정이 <br /> 없습니다
@@ -213,17 +221,17 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                <div className="bg-white/40 backdrop-blur-3xl p-10 lg:p-12 rounded-[40px] border border-white/70 shadow-xl flex flex-col items-center justify-center text-center h-full">
+                <div className="bg-white/40 dark:bg-slate-800/40 backdrop-blur-3xl p-10 lg:p-12 rounded-3xl border border-white/70 dark:border-slate-700 shadow-xl flex flex-col items-center justify-center text-center h-full">
                     <div className="space-y-6 w-full flex flex-col items-center">
                         <div className="flex flex-col items-center gap-3">
-                            <div className="w-8 h-8 bg-amber-100 rounded-[12px] flex items-center justify-center shadow-sm">
+                            <div className="w-8 h-8 bg-amber-100 rounded-xl flex items-center justify-center shadow-sm">
                                 <Sparkles className="w-4 h-4 text-amber-600" />
                             </div>
                             <span className="text-[13px] font-[900] text-slate-800 tracking-tight">오늘의 핵심 키워드</span>
                         </div>
                         <div className="flex flex-wrap justify-center gap-2 max-w-[280px]">
                             {['협업 중심', '데이터 기반', '문제 해결', '성과 도출', '성장 지향'].map(tag => (
-                                <span key={tag} className="px-3.5 py-1.5 bg-white rounded-[10px] text-[10px] font-[800] text-slate-500 border border-slate-100 shadow-sm cursor-default">
+                                <span key={tag} className="px-3.5 py-1.5 bg-white rounded-lg text-[10px] font-[800] text-slate-500 border border-slate-100 shadow-sm cursor-default">
                                     #{tag}
                                 </span>
                             ))}
@@ -259,25 +267,25 @@ export default function Dashboard() {
                         value={isEmpty ? "0" : "3"}
                         unit="일"
                     />
-                    <div className="bg-white/60 backdrop-blur-3xl p-8 rounded-[40px] border border-white/70 shadow-lg flex flex-col items-center justify-center text-center group transition-all cursor-default gap-3 h-full">
-                        <CheckCircle2 className={`w-8 h-8 mb-1 ${isEmpty ? 'text-slate-300' : 'text-green-500'}`} />
+                    <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-3xl p-8 rounded-3xl border border-white/70 dark:border-slate-700 shadow-lg flex flex-col items-center justify-center text-center group transition-all cursor-default gap-3 h-full">
+                        <CheckCircle2 className={`w-8 h-8 mb-1 ${isEmpty ? 'text-slate-300 dark:text-slate-600' : 'text-green-500'}`} />
                         <div className="space-y-1.5 flex flex-col items-center">
-                            <p className="text-[9px] font-[900] uppercase tracking-widest text-slate-400">Weekly Status</p>
-                            <h4 className="text-[14px] font-[800] text-slate-700 leading-relaxed break-keep">
-                                {isEmpty ? "첫 면접을 시작하여\n목표를 달성 하세요!" : (<>이번 주 목표의 <span className="text-indigo-600 text-[16px] font-[900]">85%</span>를 달성했습니다.</>)}
+                            <p className="text-[9px] font-[900] uppercase tracking-widest text-slate-400 dark:text-slate-500">Weekly Status</p>
+                            <h4 className="text-[14px] font-[800] text-slate-700 dark:text-slate-300 leading-relaxed break-keep">
+                                {isEmpty ? "첫 면접을 시작하여\n목표를 달성 하세요!" : (<>이번 주 목표의 <span className="text-indigo-600 dark:text-indigo-400 text-[16px] font-[900]">85%</span>를 달성했습니다.</>)}
                             </h4>
                         </div>
                     </div>
                 </div>
 
                 {/* Radar Chart */}
-                <div className={`w-full lg:w-[480px] bg-white/40 backdrop-blur-3xl p-12 lg:p-16 rounded-[50px] border border-white/70 shadow-xl flex flex-col items-center justify-center order-1 lg:order-2 relative ${isEmpty ? 'grayscale-[0.5] opacity-80' : ''}`}>
+                <div className={`w-full lg:w-[480px] bg-white/40 dark:bg-slate-800/40 backdrop-blur-3xl p-12 lg:p-16 rounded-3xl border border-white/70 dark:border-slate-700 shadow-xl flex flex-col items-center justify-center order-1 lg:order-2 relative ${isEmpty ? 'grayscale-[0.5] opacity-80' : ''}`}>
                     <div className="w-full flex justify-between items-center mb-10">
                         <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 bg-indigo-100 rounded-xl flex items-center justify-center">
-                                <Target className="w-5 h-5 text-indigo-600" />
+                            <div className="w-9 h-9 bg-indigo-100 dark:bg-indigo-500/20 rounded-xl flex items-center justify-center">
+                                <Target className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                             </div>
-                            <span className="text-sm font-black text-slate-800 tracking-tight">핵심 역량 프로필</span>
+                            <span className="text-sm font-black text-slate-800 dark:text-white tracking-tight">핵심 역량 프로필</span>
                         </div>
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">AI Analysis</span>
                     </div>
@@ -304,7 +312,7 @@ export default function Dashboard() {
                     </div>
 
                     {isEmpty && (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/10 backdrop-blur-[2px] rounded-[50px] z-20">
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/10 backdrop-blur-[2px] rounded-3xl z-20">
                             <div className="bg-slate-900 text-white px-7 py-4 rounded-2xl shadow-2xl flex items-center gap-2 scale-90 hover:scale-100 transition-transform cursor-default">
                                 <HelpCircle className="w-5 h-5" />
                                 <span className="text-xs font-black uppercase tracking-widest">No Data Available</span>
@@ -322,8 +330,8 @@ export default function Dashboard() {
             <div className="space-y-10 lg:space-y-12">
                 <div className="flex items-center justify-between px-4 mt-10">
                     <div className="flex items-center gap-4">
-                        <div className="w-1.5 h-8 bg-indigo-600 rounded-full"></div>
-                        <h3 className="text-3xl font-[900] text-slate-800 tracking-tight">최근 분석 리포트</h3>
+                        <div className="w-1.5 h-8 bg-indigo-600 dark:bg-indigo-500 rounded-full"></div>
+                        <h3 className="text-3xl font-[900] text-slate-800 dark:text-white tracking-tight">최근 분석 리포트</h3>
                     </div>
                     {!isEmpty && (
                         <button className="flex items-center gap-2 text-[11px] font-black text-slate-400 uppercase tracking-widest hover:text-indigo-600 transition-colors">
@@ -333,10 +341,10 @@ export default function Dashboard() {
                 </div>
 
                 {isEmpty ? (
-                    <div className="py-20 w-full bg-white/30 backdrop-blur-3xl rounded-[60px] border border-white/60 shadow-[0_30px_70px_rgba(79,70,229,0.06)] flex flex-col items-center justify-center text-center space-y-10">
+                    <div className="py-20 w-full bg-white/30 backdrop-blur-3xl rounded-3xl border border-white/60 shadow-[0_30px_70px_rgba(79,70,229,0.06)] flex flex-col items-center justify-center text-center space-y-10">
                         <div className="relative">
                             <div className="absolute inset-0 bg-slate-200/50 rounded-full blur-2xl animate-pulse"></div>
-                            <div className="w-20 h-20 bg-white/90 rounded-[30px] flex items-center justify-center text-slate-300 shadow-md border border-white/50 relative z-10 rotate-12">
+                            <div className="w-20 h-20 bg-white/90 rounded-3xl flex items-center justify-center text-slate-300 shadow-md border border-white/50 relative z-10 rotate-12">
                                 <BarChart3 className="w-10 h-10" />
                             </div>
                         </div>
@@ -351,12 +359,12 @@ export default function Dashboard() {
                             <div
                                 key={item.id}
                                 style={{ animationDelay: `${index * 100}ms` }}
-                                className="group relative p-12 lg:p-14 bg-white/40 backdrop-blur-3xl border border-white/70 rounded-[48px] hover:bg-white/90 hover:border-indigo-400/50 hover:shadow-[0_40px_80px_rgba(79,70,229,0.12)] hover:-translate-y-2 transition-all duration-700 flex flex-col lg:flex-row lg:items-center justify-between gap-14 overflow-hidden animate-in fade-in slide-in-from-bottom-8 fill-mode-both"
+                                className="group relative p-12 lg:p-14 bg-white/40 backdrop-blur-3xl border border-white/70 rounded-3xl hover:bg-white/90 hover:border-indigo-400/50 hover:shadow-[0_40px_80px_rgba(79,70,229,0.12)] hover:-translate-y-2 transition-all duration-700 flex flex-col lg:flex-row lg:items-center justify-between gap-14 overflow-hidden animate-in fade-in slide-in-from-bottom-8 fill-mode-both"
                             >
                                 <div className="absolute -top-20 -right-20 w-64 h-64 bg-indigo-50/50 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
 
                                 <div className="flex items-start gap-10 relative z-10 w-full lg:w-auto">
-                                    <div className="w-18 h-18 bg-white shadow-sm rounded-[24px] flex flex-col items-center justify-center group-hover:bg-slate-900 group-hover:text-white transition-all duration-500 shrink-0 border border-slate-50 group-hover:border-slate-800 scale-100 group-hover:scale-110 group-hover:rotate-6">
+                                    <div className="w-18 h-18 bg-white shadow-sm rounded-2xl flex flex-col items-center justify-center group-hover:bg-slate-900 group-hover:text-white transition-all duration-500 shrink-0 border border-slate-50 group-hover:border-slate-800 scale-100 group-hover:scale-110 group-hover:rotate-6">
                                         <Calendar className="w-6 h-6 mb-1.5 opacity-80" />
                                         <span className="text-[10px] font-[1000] uppercase tracking-tighter">
                                             {item.interviews?.created_at ? new Date(item.interviews.created_at).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }) : "-"}
@@ -398,7 +406,7 @@ export default function Dashboard() {
                                             </div>
                                         ))}
                                     </div>
-                                    <button className="w-20 h-20 rounded-[35px] bg-slate-900 text-white flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-2xl shadow-slate-400 group-hover:bg-indigo-600 group-hover:shadow-indigo-200/60 shrink-0 border-4 border-white/50">
+                                    <button className="w-20 h-20 rounded-3xl bg-slate-900 text-white flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-2xl shadow-slate-400 group-hover:bg-indigo-600 group-hover:shadow-indigo-200/60 shrink-0 border-4 border-white/50">
                                         <ArrowRight className="w-9 h-9" />
                                     </button>
                                 </div>
@@ -406,21 +414,148 @@ export default function Dashboard() {
                         ))}
                     </div>
                 )}
+
+                {/* Upcoming Public Enterprise Section */}
+                <div className="mt-32 space-y-12 mb-20">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-6">
+                            <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-200">
+                                <Briefcase className="w-8 h-8" />
+                            </div>
+                            <div className="space-y-1">
+                                <h2 className="text-3xl font-[1000] text-slate-800 tracking-tight">공기업 채용 리스트</h2>
+                                <p className="text-slate-500 font-bold text-base">실시간 동기화된 마감 임박 공고</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                        {jobs.filter(j => j.category !== "기타" || j.notes?.includes("ALIO")).slice(0, 6).map((job, idx) => (
+                            <div key={idx} className="bg-white/60 backdrop-blur-3xl border border-white/80 rounded-3xl p-8 hover:shadow-2xl hover:shadow-indigo-100/50 hover:-translate-y-2 transition-all duration-500 group relative overflow-hidden flex flex-col justify-between h-full">
+                                <div className="space-y-6">
+                                    <div className="flex items-center justify-between">
+                                        <span className="px-4 py-1.5 bg-indigo-50 text-indigo-600 text-[10px] font-black rounded-lg uppercase tracking-tighter border border-indigo-100/50">
+                                            {job.category || "공기업"}
+                                        </span>
+                                        <div className="flex items-center gap-2 text-red-500 font-black text-[11px] bg-red-50/50 px-3 py-1 rounded-full border border-red-100/50">
+                                            <Clock className="w-3 h-3" />
+                                            D-{Math.ceil((new Date(job.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))}
+                                        </div>
+                                    </div>
+                                    <div className="space-y-3">
+                                        <h3 className="text-xl font-black text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">{job.company}</h3>
+                                        <p className="text-sm font-bold text-slate-500 line-clamp-2 md:h-10 leading-relaxed">{job.position}</p>
+                                    </div>
+                                </div>
+
+                                <div className="mt-8 flex items-center gap-3">
+                                    <a
+                                        href={job.url || "https://www.alio.go.kr"}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex-1 py-4 bg-slate-900 text-white rounded-xl text-xs font-black flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-lg"
+                                    >
+                                        지원하기 <ExternalLink className="w-3.5 h-3.5" />
+                                    </a>
+                                    <button
+                                        onClick={() => handleViewGuide(job)}
+                                        className="flex-1 py-4 bg-white border border-slate-200 text-slate-600 rounded-xl text-xs font-black flex items-center justify-center gap-2 hover:bg-slate-50 transition-all shadow-sm"
+                                    >
+                                        준비 가이드 <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
+
+            {/* AI Guide Modal */}
+            {selectedGuide && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-300">
+                    <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in duration-300 border border-white/50">
+                        <div className="px-10 py-8 bg-gradient-to-r from-indigo-600 to-purple-600 text-white flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-md">
+                                    <Sparkles className="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-black tracking-tight">{selectedGuide.company}</h3>
+                                    <p className="text-[10px] uppercase font-black opacity-70 tracking-widest text-indigo-100">AI Preparation Guide</p>
+                                </div>
+                            </div>
+                            <button onClick={() => setSelectedGuide(null)} className="p-2 hover:bg-white/20 rounded-full transition-all">
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+                        <div className="p-10 space-y-10 max-h-[70vh] overflow-y-auto scrollbar-hide">
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-1.5 h-6 bg-indigo-500 rounded-full"></div>
+                                    <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest">기업 인재상 핵심 요약</h4>
+                                </div>
+                                <div className="p-6 bg-indigo-50/50 rounded-2xl border border-indigo-100 text-slate-700 font-bold leading-relaxed">
+                                    {selectedGuide.company_trait}
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3">
+                                        <Info className="w-5 h-5 text-purple-500" />
+                                        <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">자소서 중점 사항</h4>
+                                    </div>
+                                    <p className="text-sm text-slate-500 font-bold leading-relaxed bg-slate-50 p-6 rounded-2xl border border-slate-100 min-h-[150px]">
+                                        {selectedGuide.resume_focus}
+                                    </p>
+                                </div>
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3">
+                                        <Target className="w-5 h-5 text-indigo-500" />
+                                        <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">면접 준비 포인트</h4>
+                                    </div>
+                                    <p className="text-sm text-slate-500 font-bold leading-relaxed bg-slate-50 p-6 rounded-2xl border border-slate-100 min-h-[150px]">
+                                        {selectedGuide.interview_focus}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="px-10 py-8 bg-slate-50 border-t border-slate-100">
+                            <button
+                                onClick={() => setSelectedGuide(null)}
+                                className="w-full py-4 bg-slate-900 text-white rounded-xl text-sm font-black shadow-xl shadow-slate-200"
+                            >
+                                가이드 닫기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Guide Loading Overlay */}
+            {isGuideLoading && (
+                <div className="fixed inset-0 z-[300] bg-white/60 backdrop-blur-md flex flex-col items-center justify-center gap-6 animate-in fade-in duration-300">
+                    <div className="w-16 h-16 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
+                    <div className="text-center space-y-2">
+                        <p className="text-xl font-black text-slate-800">AI 분석 리포트 생성 중...</p>
+                        <p className="text-sm font-bold text-slate-400">기업의 최신 인재상과 요구 역량을 분석하고 있습니다.</p>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
 
 function StatCard({ icon, label, value, unit }: { icon: React.ReactNode, label: string, value: string | number, unit: string }) {
     return (
-        <div className="bg-white/40 backdrop-blur-3xl p-8 rounded-[40px] border border-white/60 shadow-[0_15px_30px_rgba(0,0,0,0.03)] flex flex-col items-center justify-center text-center gap-4 transition-all flex-1 h-full">
-            <div className="w-12 h-12 bg-white rounded-[16px] flex items-center justify-center shadow-sm border border-slate-50">
+        <div className="bg-white/40 dark:bg-slate-800/40 backdrop-blur-3xl p-8 rounded-2xl border border-white/60 dark:border-slate-700 shadow-[0_15px_30px_rgba(0,0,0,0.03)] dark:shadow-none flex flex-col items-center justify-center text-center gap-4 transition-all flex-1 h-full">
+            <div className="w-12 h-12 bg-white dark:bg-slate-700 rounded-2xl flex items-center justify-center shadow-sm border border-slate-50 dark:border-slate-600">
                 {icon}
             </div>
             <div className="space-y-1 flex flex-col items-center">
-                <p className="text-[9px] font-[900] text-slate-400 uppercase tracking-widest">{label}</p>
-                <h4 className="flex items-baseline gap-1 text-[28px] font-[900] text-slate-900 tracking-tighter">
-                    {value}<span className="text-[12px] font-[800] text-slate-400">{unit}</span>
+                <p className="text-[9px] font-[900] text-slate-400 dark:text-slate-500 uppercase tracking-widest">{label}</p>
+                <h4 className="flex items-baseline gap-1 text-[28px] font-[900] text-slate-900 dark:text-slate-100 tracking-tighter">
+                    {value}<span className="text-[12px] font-[800] text-slate-400 dark:text-slate-500">{unit}</span>
                 </h4>
             </div>
         </div>

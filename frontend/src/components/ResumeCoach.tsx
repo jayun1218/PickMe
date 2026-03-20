@@ -66,7 +66,7 @@ export default function ResumeCoach({ onAnalysisComplete }: ResumeCoachProps) {
                         </div>
                         <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">나의 경험 들려주기</h3>
                     </div>
-                    <div className="relative group h-64 rounded-[24px] border border-white/30 bg-gradient-to-br from-white/30 to-white/10 backdrop-blur-3xl p-8 flex flex-col transition-all duration-500 shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:shadow-[0_20px_40px_rgba(124,58,237,0.15)] overflow-hidden">
+                    <div className="relative group h-64 rounded-2xl border border-white/30 bg-gradient-to-br from-white/30 to-white/10 backdrop-blur-3xl p-8 flex flex-col transition-all duration-500 shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:shadow-[0_20px_40px_rgba(124,58,237,0.15)] overflow-hidden">
                         <div className="absolute inset-0 bg-gradient-to-br from-purple-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                         <div className="relative z-10 h-full flex flex-col">
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 group-hover:text-purple-500 transition-colors flex items-center gap-2">
@@ -90,7 +90,7 @@ export default function ResumeCoach({ onAnalysisComplete }: ResumeCoachProps) {
                     <button
                         onClick={handleCoach}
                         disabled={isDisabled}
-                        className={`w-full group relative overflow-hidden h-24 rounded-[20px] font-[900] text-xl transition-all duration-500 flex items-center justify-center gap-4 ${isDisabled
+                        className={`w-full group relative overflow-hidden h-24 rounded-2xl font-[900] text-xl transition-all duration-500 flex items-center justify-center gap-4 ${isDisabled
                             ? "bg-white/10 backdrop-blur-2xl text-slate-400 border border-white/20 cursor-not-allowed shadow-[0_8px_30px_rgb(0,0,0,0.05)]"
                             : "bg-slate-900 text-white hover:-translate-y-1 shadow-[0_20px_40px_rgba(15,23,42,0.2)] hover:shadow-[0_20px_50px_rgba(124,58,237,0.3)] border border-slate-800"
                             }`}

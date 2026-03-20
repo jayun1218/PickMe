@@ -61,7 +61,7 @@ class DatabaseManager:
             # results와 interviews 테이블을 조인하여 가져옴
             res = self.client.table("interview_results")\
                 .select("*, interviews(resume_summary, created_at)")\
-                .order("created_at", descending=True)\
+                .order("created_at", desc=True)\
                 .limit(limit)\
                 .execute()
             return res.data
@@ -125,5 +125,57 @@ class DatabaseManager:
         except Exception as e:
             print(f"공고 수정 중 오류 발생: {e}")
             return None
+
+    # --- 다중 이력서 프로필 및 오답노트 스크랩 ---
+    
+    async def save_user_resume(self, user_id: str, filename: str, content: str):
+        if not self.client:
+            return None
+        try:
+            res = self.client.table("user_resumes").insert({"user_id": user_id, "filename": filename, "content": content}).execute()
+            return res.data[0]
+        except Exception as e:
+            print(f"이력서 저장 중 오류 발생: {e}")
+            return None
+
+    async def get_user_resumes(self, user_id: str):
+        if not self.client:
+            return []
+        try:
+            res = self.client.table("user_resumes").select("*").eq("user_id", user_id).order("created_at", desc=True).execute()
+            return res.data
+        except Exception as e:
+            print(f"이력서 조회 중 오류 발생: {e}")
+            return []
+
+    async def save_scrapped_question(self, user_id: str, question: str, company_name: str = None):
+        if not self.client:
+            return None
+        try:
+            res = self.client.table("scrapped_questions").insert({"user_id": user_id, "question": question, "company_name": company_name}).execute()
+            return res.data[0]
+        except Exception as e:
+            print(f"질문 스크랩 중 오류 발생: {e}")
+            return None
+
+    async def get_scrapped_questions(self, user_id: str):
+        if not self.client:
+            return []
+        try:
+            res = self.client.table("scrapped_questions").select("*").eq("user_id", user_id).order("created_at", desc=True).execute()
+            return res.data
+        except Exception as e:
+            print(f"스크랩 질문 조회 중 오류 발생: {e}")
+            return []
+
+    async def delete_scrapped_question(self, question_id: str):
+        if not self.client:
+            return False
+        try:
+            self.client.table("scrapped_questions").delete().eq("id", question_id).execute()
+            return True
+        except Exception as e:
+            print(f"스크랩 삭제 중 오류 발생: {e}")
+            return False
 
 db_manager = DatabaseManager()

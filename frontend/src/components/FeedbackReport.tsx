@@ -31,7 +31,7 @@ export default function FeedbackReport({ data, onRestart }: FeedbackReportProps)
     return (
         <div className="w-full max-w-5xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-12 duration-1000">
             {/* Main Analysis Dashboard */}
-            <div className="bg-white p-12 rounded-[50px] border border-slate-50 shadow-2xl shadow-indigo-100/40 relative overflow-hidden">
+            <div className="bg-white p-12 rounded-3xl border border-slate-50 shadow-2xl shadow-indigo-100/40 relative overflow-hidden">
                 {/* Background Decorative Element */}
                 <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-50/50 rounded-full blur-3xl -z-10"></div>
 
@@ -71,7 +71,7 @@ export default function FeedbackReport({ data, onRestart }: FeedbackReportProps)
 
                     {/* Right: Summary Side */}
                     <div className="w-full md:w-80 flex flex-col pt-4">
-                        <div className="flex-1 h-full bg-slate-50 p-10 rounded-[40px] flex flex-col justify-center relative">
+                        <div className="flex-1 h-full bg-slate-50 p-10 rounded-3xl flex flex-col justify-center relative">
                             <div className="absolute top-8 left-8 text-slate-200 font-serif text-6xl leading-none">“</div>
                             <p className="text-xl text-slate-700 leading-relaxed font-bold italic z-10 text-center">
                                 {data.overall_feedback}
@@ -86,7 +86,7 @@ export default function FeedbackReport({ data, onRestart }: FeedbackReportProps)
             {/* Qualititative Cards */}
             <div className="grid md:grid-cols-2 gap-8">
                 {/* Strengths Card */}
-                <div className="bg-white p-10 rounded-[45px] border border-slate-50 shadow-xl hover:shadow-2xl hover:shadow-green-100/30 transition-all group">
+                <div className="bg-white p-10 rounded-3xl border border-slate-50 shadow-xl hover:shadow-2xl hover:shadow-green-100/30 transition-all group">
                     <div className="flex items-center gap-4 mb-8">
                         <div className="w-14 h-14 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center group-hover:bg-green-500 group-hover:text-white transition-all shadow-sm">
                             <ThumbsUp className="w-7 h-7" />
@@ -108,7 +108,7 @@ export default function FeedbackReport({ data, onRestart }: FeedbackReportProps)
                 </div>
 
                 {/* Improvements Card */}
-                <div className="bg-white p-10 rounded-[45px] border border-slate-50 shadow-xl hover:shadow-2xl hover:shadow-amber-100/30 transition-all group">
+                <div className="bg-white p-10 rounded-3xl border border-slate-50 shadow-xl hover:shadow-2xl hover:shadow-amber-100/30 transition-all group">
                     <div className="flex items-center gap-4 mb-8">
                         <div className="w-14 h-14 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center group-hover:bg-amber-500 group-hover:text-white transition-all shadow-sm">
                             <AlertCircle className="w-7 h-7" />
@@ -134,7 +134,7 @@ export default function FeedbackReport({ data, onRestart }: FeedbackReportProps)
             <div className="flex flex-col items-center gap-8 py-10">
                 <button
                     onClick={onRestart}
-                    className="group flex items-center gap-4 bg-slate-900 text-white px-12 py-6 rounded-[30px] font-black text-xl hover:scale-105 transition-all shadow-2xl shadow-indigo-100/50 hover:bg-gradient-premium ring-8 ring-transparent hover:ring-indigo-50"
+                    className="group flex items-center gap-4 bg-slate-900 text-white px-12 py-6 rounded-2xl font-black text-xl hover:scale-105 transition-all shadow-2xl shadow-indigo-100/50 hover:bg-gradient-premium ring-8 ring-transparent hover:ring-indigo-50"
                 >
                     <RotateCcw className="w-6 h-6 group-hover:rotate-180 transition-transform duration-700" />
                     다른 질문으로 연습하기

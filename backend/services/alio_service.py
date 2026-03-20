@@ -84,6 +84,7 @@ class AlioService:
                                 "position": position[:100], # safe clip
                                 "deadline": deadline,
                                 "category": category,
+                                "url": item.get("recrutPbancUrl") or item.get("srcPath") or "https://www.alio.go.kr",
                                 "notes": notes
                             })
 

@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Upload, FileText, X, CheckCircle2, Loader2, Sparkles } from 'lucide-react';
-import { analyzeResume } from '@/lib/api';
+import { Upload, FileText, X, CheckCircle2, Loader2, Sparkles, FolderOpen, ChevronRight } from 'lucide-react';
+import { analyzeResume, getUserResumes, analyzeResumeText, saveUserResume } from '@/lib/api';
 
 interface ResumeUploadProps {
     onAnalysisComplete: (data: any) => void;
@@ -38,11 +38,30 @@ export default function ResumeUpload({ onAnalysisComplete }: ResumeUploadProps) 
         }
     };
 
+    const [pastResumes, setPastResumes] = useState<any[]>([]);
+
+    React.useEffect(() => {
+        const fetchResumes = async () => {
+            try {
+                const res = await getUserResumes('test-user');
+                setPastResumes(res || []);
+            } catch(e) {
+                console.error("Failed to fetch past resumes", e);
+            }
+        };
+        fetchResumes();
+    }, []);
+
     const handleUpload = async () => {
         if (!file) return;
         setIsUploading(true);
         try {
             const data = await analyzeResume(file);
+            try {
+                if (data.content) {
+                    await saveUserResume('test-user', file.name, data.content);
+                }
+            } catch(e) { console.error('Failed to save user resume'); }
             onAnalysisComplete({ ...data, filename: file.name });
         } catch (error) {
             console.error('Upload failed:', error);
@@ -52,10 +71,23 @@ export default function ResumeUpload({ onAnalysisComplete }: ResumeUploadProps) 
         }
     };
 
+    const handlePastResumeSelect = async (resume: any) => {
+        setIsUploading(true);
+        try {
+            const data = await analyzeResumeText(resume.content);
+            onAnalysisComplete({ ...data, filename: resume.filename });
+        } catch (e) {
+            console.error(e);
+            alert('이전 이력서 분석 중 오류가 발생했습니다.');
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
     return (
         <div className="w-full max-w-3xl mx-auto flex flex-col gap-16">
             <div
-                className={`relative group h-72 rounded-3xl border border-white/30 transition-all duration-500 overflow-hidden flex flex-col items-center justify-center bg-gradient-to-br from-white/30 to-white/10 backdrop-blur-3xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] ${dragActive
+                className={`relative group h-72 rounded-2xl border border-white/30 transition-all duration-500 overflow-hidden flex flex-col items-center justify-center bg-gradient-to-br from-white/30 to-white/10 backdrop-blur-3xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] ${dragActive
                     ? "border-indigo-400 bg-indigo-50/40 scale-[1.02] shadow-indigo-500/20"
                     : "hover:border-white/50 hover:bg-gradient-to-br hover:from-white/40 hover:to-white/20 hover:shadow-[0_20px_40px_rgba(79,70,229,0.15)]"
                     }`}
@@ -100,7 +132,7 @@ export default function ResumeUpload({ onAnalysisComplete }: ResumeUploadProps) 
             <button
                 onClick={handleUpload}
                 disabled={isUploading}
-                className="w-full group relative overflow-hidden h-20 rounded-[20px] bg-slate-900 border border-slate-800 text-white font-black text-xl hover:-translate-y-1 active:scale-95 transition-all duration-500 shadow-[0_20px_40px_rgba(15,23,42,0.2)] hover:shadow-[0_20px_50px_rgba(79,70,229,0.3)] flex items-center justify-center gap-3"
+                className="w-full group relative overflow-hidden h-20 rounded-2xl bg-slate-900 border border-slate-800 text-white font-black text-xl hover:-translate-y-1 active:scale-95 transition-all duration-500 shadow-[0_20px_40px_rgba(15,23,42,0.2)] hover:shadow-[0_20px_50px_rgba(79,70,229,0.3)] flex items-center justify-center gap-3"
             >
                 {isUploading ? (
                     <>
@@ -117,6 +149,36 @@ export default function ResumeUpload({ onAnalysisComplete }: ResumeUploadProps) 
                 {/* Subtle Glow Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
             </button>
+
+            {/* Saved Resumes Section */}
+            {pastResumes.length > 0 && (
+                <div className="w-full mt-2 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="flex items-center gap-2 mb-4 px-2">
+                        <FolderOpen className="w-5 h-5 text-indigo-400" />
+                        <h4 className="text-[14px] font-[900] text-slate-700 dark:text-slate-300 tracking-tight">저장된 내 이력서 불러오기</h4>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {pastResumes.slice(0, 4).map((resume, idx) => (
+                            <button
+                                key={resume.id || idx}
+                                onClick={() => handlePastResumeSelect(resume)}
+                                disabled={isUploading}
+                                className="text-left bg-white/50 dark:bg-slate-800/50 backdrop-blur-xl p-4 rounded-2xl border border-white/60 dark:border-slate-700 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-600 transition-all group flex items-center justify-between"
+                            >
+                                <div className="space-y-1">
+                                    <p className="text-[13px] font-[800] text-slate-800 dark:text-slate-200 truncate pr-4">{resume.filename}</p>
+                                    <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500">
+                                        {new Date(resume.created_at).toLocaleDateString('ko-KR')} 등록됨
+                                    </p>
+                                </div>
+                                <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-colors shrink-0">
+                                    <ChevronRight className="w-4 h-4" />
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

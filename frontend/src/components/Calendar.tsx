@@ -135,18 +135,18 @@ export default function JobCalendar() {
             {/* Header & Controls */}
             <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200">
+                    <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200 dark:shadow-none">
                         <CalendarIcon className="text-white w-6 h-6" />
                     </div>
                     <div>
-                        <h2 className="text-3xl font-[900] text-slate-900 tracking-tight">취업 캘린더</h2>
-                        <p className="text-slate-500 font-bold text-sm tracking-tight">중요한 마감 기한을 놓치지 마세요</p>
+                        <h2 className="text-3xl font-[900] text-slate-900 dark:text-white tracking-tight">취업 캘린더</h2>
+                        <p className="text-slate-500 dark:text-slate-400 font-bold text-sm tracking-tight">중요한 마감 기한을 놓치지 마세요</p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-4 bg-white/50 backdrop-blur-md p-2 rounded-2xl border border-white/60 shadow-sm">
-                    <button onClick={prevMonth} className="p-2 hover:bg-white rounded-xl transition-colors"><ChevronLeft className="w-5 h-5 text-slate-600" /></button>
-                    <span className="text-lg font-black text-slate-800 min-w-[140px] text-center">
+                <div className="flex items-center gap-4 bg-white/50 dark:bg-slate-800/50 backdrop-blur-md p-2 rounded-2xl border border-white/60 dark:border-slate-700 shadow-sm">
+                    <button onClick={prevMonth} className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-xl transition-colors"><ChevronLeft className="w-5 h-5 text-slate-600 dark:text-slate-300" /></button>
+                    <span className="text-lg font-black text-slate-800 dark:text-slate-200 min-w-[140px] text-center">
                         {currentDate.getFullYear()}년 {currentDate.getMonth() + 1}월
                     </span>
                     <button onClick={nextMonth} className="p-2 hover:bg-white rounded-xl transition-colors"><ChevronRight className="w-5 h-5 text-slate-600" /></button>
@@ -188,7 +188,7 @@ export default function JobCalendar() {
             </div>
 
             {/* Calendar Grid */}
-            <div className="bg-white/40 backdrop-blur-3xl rounded-[40px] border border-white/60 p-8 shadow-2xl shadow-indigo-900/5">
+            <div className="bg-white/40 backdrop-blur-3xl rounded-3xl border border-white/60 p-8 shadow-2xl shadow-indigo-900/5">
                 <div className="grid grid-cols-7 mb-6 border-b border-slate-100/50 pb-4">
                     {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map((d, index) => (
                         <div key={d} className={`text-center text-[10px] font-black tracking-widest ${index === 0 ? 'text-red-400' : index === 6 ? 'text-indigo-400' : 'text-slate-400'}`}>
@@ -266,14 +266,14 @@ export default function JobCalendar() {
             {isModalOpen && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center px-6 py-10">
                     <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={closeModal}></div>
-                    <div className="w-full max-w-3xl bg-white rounded-[60px] shadow-2xl relative z-10 p-16 pb-32 border border-white max-h-[95vh] overflow-y-auto animate-in zoom-in duration-500 scrollbar-hide">
+                    <div className="w-full max-w-3xl bg-white rounded-3xl shadow-2xl relative z-10 p-16 pb-32 border border-white max-h-[95vh] overflow-y-auto animate-in zoom-in duration-500 scrollbar-hide">
                         <div className="absolute top-0 right-0 p-6">
                             <button onClick={closeModal} className="text-slate-400 hover:text-slate-600 p-2"><X className="w-6 h-6" /></button>
                         </div>
 
                         <div className="space-y-12">
                             <div className="flex items-center gap-8 border-b border-slate-50 pb-12 -mx-16 px-16">
-                                <div className="w-20 h-20 bg-indigo-100 rounded-[30px] flex items-center justify-center shadow-inner">
+                                <div className="w-20 h-20 bg-indigo-100 rounded-3xl flex items-center justify-center shadow-inner">
                                     <Bell className="text-indigo-600 w-10 h-10" />
                                 </div>
                                 <div className="space-y-2">
@@ -293,7 +293,7 @@ export default function JobCalendar() {
                                             required
                                             type="text"
                                             placeholder="예: 구글 코리아"
-                                            className="w-full pl-24 pr-10 py-8 bg-slate-50 border-2 border-slate-100 rounded-[35px] focus:ring-8 focus:ring-indigo-500/5 focus:border-indigo-500 outline-none text-xl font-bold text-slate-700 placeholder:text-slate-200 transition-all"
+                                            className="w-full pl-24 pr-10 py-8 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:ring-8 focus:ring-indigo-500/5 focus:border-indigo-500 outline-none text-xl font-bold text-slate-700 placeholder:text-slate-200 transition-all"
                                             value={newJob.company}
                                             onChange={(e) => setNewJob({ ...newJob, company: e.target.value })}
                                         />
@@ -310,14 +310,14 @@ export default function JobCalendar() {
                                             required
                                             type="text"
                                             placeholder="예: 신입 프런트엔드 개발자"
-                                            className="w-full pl-24 pr-10 py-8 bg-slate-50 border-2 border-slate-100 rounded-[35px] focus:ring-8 focus:ring-indigo-500/5 focus:border-indigo-500 outline-none text-xl font-bold text-slate-700 placeholder:text-slate-200 transition-all"
+                                            className="w-full pl-24 pr-10 py-8 bg-slate-50 border-2 border-slate-100 rounded-3xl focus:ring-8 focus:ring-indigo-500/5 focus:border-indigo-500 outline-none text-xl font-bold text-slate-700 placeholder:text-slate-200 transition-all"
                                             value={newJob.position}
                                             onChange={(e) => setNewJob({ ...newJob, position: e.target.value })}
                                         />
                                     </div>
                                 </div>
 
-                                <div className="space-y-4 bg-slate-50/50 p-6 rounded-[40px] border-2 border-slate-100 pb-8">
+                                <div className="space-y-4 bg-slate-50/50 p-6 rounded-3xl border-2 border-slate-100 pb-8">
                                     <h4 className="text-lg font-black text-slate-800 mb-6 pl-2">일정 날짜 정보</h4>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
@@ -340,7 +340,7 @@ export default function JobCalendar() {
                                 </div>
 
                                 <div className="pt-12">
-                                    <button type="submit" className="w-full py-8 bg-slate-900 text-white rounded-[40px] font-[1000] text-2xl uppercase tracking-[0.5em] hover:bg-indigo-600 hover:shadow-[0_30px_60px_rgba(79,70,229,0.3)] transition-all active:scale-[0.97] shadow-2xl shadow-slate-200 group">
+                                    <button type="submit" className="w-full py-8 bg-slate-900 text-white rounded-3xl font-[1000] text-2xl uppercase tracking-[0.5em] hover:bg-indigo-600 hover:shadow-[0_30px_60px_rgba(79,70,229,0.3)] transition-all active:scale-[0.97] shadow-2xl shadow-slate-200 group">
                                         {editingJobId ? '일정 수정하기' : '일정 저장하기'}
                                     </button>
                                 </div>

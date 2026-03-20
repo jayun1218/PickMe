@@ -48,7 +48,7 @@ export default function ResumeCoachResult({ data, onReset }: ResumeCoachResultPr
                 </div>
                 <button
                     onClick={onReset}
-                    className="flex items-center gap-2 px-8 py-4 bg-slate-900 text-white rounded-[20px] text-sm font-black hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200"
+                    className="flex items-center gap-2 px-8 py-4 bg-slate-900 text-white rounded-2xl text-sm font-black hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200"
                 >
                     <ChevronRight className="w-4 h-4 rotate-180" />
                     새로운 경험 분석하기
@@ -56,7 +56,7 @@ export default function ResumeCoachResult({ data, onReset }: ResumeCoachResultPr
             </header>
 
             {/* Benchmarking Summary Bar */}
-            <div className="bg-white/40 backdrop-blur-3xl rounded-[40px] p-10 border border-white/70 shadow-2xl shadow-indigo-900/5 relative overflow-hidden group">
+            <div className="bg-white/40 backdrop-blur-3xl rounded-3xl p-10 border border-white/70 shadow-2xl shadow-indigo-900/5 relative overflow-hidden group">
                 <div className="flex flex-col lg:flex-row items-center gap-12">
                     <div className="relative flex-shrink-0">
                         <svg className="w-40 h-40">
@@ -93,7 +93,7 @@ export default function ResumeCoachResult({ data, onReset }: ResumeCoachResultPr
             <div className="grid lg:grid-cols-5 gap-10">
                 {/* Left: STAR Structure Analysis */}
                 <div className="lg:col-span-2 space-y-8">
-                    <div className="bg-white/40 backdrop-blur-2xl rounded-[40px] p-10 border border-white/60 shadow-xl shadow-indigo-900/5 relative overflow-hidden">
+                    <div className="bg-white/40 backdrop-blur-2xl rounded-3xl p-10 border border-white/60 shadow-xl shadow-indigo-900/5 relative overflow-hidden">
                         <h3 className="text-xl font-black text-slate-900 mb-10 flex items-center gap-3">
                             <BrainCircuit className="w-6 h-6 text-indigo-600" />
                             STAR 구조화 분석
@@ -122,7 +122,7 @@ export default function ResumeCoachResult({ data, onReset }: ResumeCoachResultPr
                         </div>
                     </div>
 
-                    <div className="bg-slate-900 rounded-[35px] p-8 text-white shadow-2xl relative overflow-hidden group">
+                    <div className="bg-slate-900 rounded-3xl p-8 text-white shadow-2xl relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-40 h-40 bg-indigo-500/20 blur-3xl -mr-12 -mt-12 group-hover:bg-indigo-500/30 transition-colors"></div>
                         <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.3em] mb-3">Key Insight</h4>
                         <p className="text-lg font-bold leading-relaxed italic">"{data.key_insight}"</p>
@@ -131,7 +131,7 @@ export default function ResumeCoachResult({ data, onReset }: ResumeCoachResultPr
 
                 {/* Right: Improved Draft */}
                 <div className="lg:col-span-3">
-                    <div className="h-full bg-white/60 backdrop-blur-3xl rounded-[40px] p-12 border border-white/80 shadow-2xl shadow-indigo-900/10 flex flex-col">
+                    <div className="h-full bg-white/60 backdrop-blur-3xl rounded-3xl p-12 border border-white/80 shadow-2xl shadow-indigo-900/10 flex flex-col">
                         <div className="flex justify-between items-center mb-10">
                             <h3 className="text-2xl font-[1000] text-slate-900 flex items-center gap-3 tracking-tight">
                                 <PenTool className="w-8 h-8 text-purple-600" />
@@ -139,14 +139,14 @@ export default function ResumeCoachResult({ data, onReset }: ResumeCoachResultPr
                             </h3>
                             <button
                                 onClick={() => copyToClipboard(data.improved_draft)}
-                                className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-[18px] text-[11px] font-black uppercase tracking-widest hover:bg-indigo-600 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-slate-200"
+                                className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-indigo-600 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-slate-200"
                             >
                                 <Copy className="w-4 h-4" />
                                 Copy Text
                             </button>
                         </div>
 
-                        <div className="flex-1 bg-white/50 rounded-[30px] p-10 border border-white relative group">
+                        <div className="flex-1 bg-white/50 rounded-3xl p-10 border border-white relative group">
                             <div className="absolute top-6 right-6 animate-pulse">
                                 <Sparkles className="w-6 h-6 text-purple-400" />
                             </div>
