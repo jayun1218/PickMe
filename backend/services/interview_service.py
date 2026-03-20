@@ -47,7 +47,16 @@ class InterviewService:
         - 지원자의 감정보다는 사실과 논리에 집중하며 냉철한 태도를 보이세요.
         """
 
-        system_prompt = base_persona + (pressure_instruction if is_pressure_mode else "") + """
+        target_company = context.get("target_company") if context else None
+        
+        company_instruction = f"""
+        [특정 공기업/기관 맞춤 모드]
+        - 당신은 현재 '{target_company}'의 현직 실무진 최고 관리자이자 핵심 면접관입니다.
+        - 무조건 '{target_company}'의 인재상, 최근 주요 이슈, 경영 목표를 바탕으로 역량 꼬리 질문을 던지세요.
+        - 산업 특성(예: 에너지 관련 기업이라면 신재생에너지/탄소중립, SOC라면 안전/스마트인프라, 보건/복지라면 고객중심/초고령화 등)을 묻는 뉘앙스를 질문에 살짝 풍겨서 실제 공기업 면접장에 온 것 같은 압박갑을 주세요.
+        """ if target_company and target_company.strip() else ""
+
+        system_prompt = base_persona + (pressure_instruction if is_pressure_mode else "") + company_instruction + """
         응답은 반드시 아래의 JSON 형식으로만 해주세요:
         {
             "content": "면접관의 응답 내용",

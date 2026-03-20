@@ -91,7 +91,7 @@ export const getJobs = async () => {
     return response.data;
 };
 
-export const addJob = async (jobData: { company: string; position: string; deadline: string; notes?: string }) => {
+export const addJob = async (jobData: { company: string; position: string; deadline: string; written_exam_date?: string; first_interview_date?: string; second_interview_date?: string; notes?: string }) => {
     const response = await api.post('/api/v1/jobs', jobData);
     return response.data;
 };
@@ -101,12 +101,13 @@ export const deleteJob = async (appId: string) => {
     return response.data;
 };
 
-export const updateJob = async (appId: string, jobData: { company: string; position: string; deadline: string; notes?: string }) => {
+export const updateJob = async (appId: string, jobData: { company: string; position: string; deadline: string; written_exam_date?: string; first_interview_date?: string; second_interview_date?: string; notes?: string }) => {
     const response = await api.put(`/api/v1/jobs/${appId}`, jobData);
     return response.data;
 };
 
-export const syncAlioJobs = async () => {
-    const response = await api.post('/api/v1/jobs/sync-alio');
+export const syncAlioJobs = async (category: string = "전체") => {
+    const url = category && category !== "전체" ? `/api/v1/jobs/sync-alio?category=${encodeURIComponent(category)}` : '/api/v1/jobs/sync-alio';
+    const response = await api.post(url);
     return response.data;
 };

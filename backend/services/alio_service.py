@@ -64,12 +64,26 @@ class AlioService:
                             if not deadline:
                                 continue # Skip if no deadline
 
+                            # Determine category
+                            category = "기타"
+                            if any(k in company for k in ["전력", "발전", "수력", "원자력", "에너지", "가스", "난방"]):
+                                category = "에너지"
+                            elif any(k in company for k in ["도로", "철도", "교통", "공항", "항만", "수자원", "국토", "주택", "토지", "도시"]):
+                                category = "SOC/건설/교통"
+                            elif any(k in company for k in ["건강", "보건", "병원", "의료원", "적십자", "연금", "복지", "의료", "장애인"]):
+                                category = "보건/복지"
+                            elif any(k in company for k in ["금융", "은행", "보증", "구역", "자산", "투자", "예탁", "신용", "기금"]):
+                                category = "금융"
+                            elif any(k in company for k in ["연구", "과학", "기술", "진흥", "평가", "원"]):
+                                category = "R&D/연구"
+
                             notes = f"ALIO 공공데이터 연동 공고\n고용형태: {item.get('recrutSeNm', '알수없음')}"
                             
                             parsed_jobs.append({
                                 "company": company,
                                 "position": position[:100], # safe clip
                                 "deadline": deadline,
+                                "category": category,
                                 "notes": notes
                             })
 

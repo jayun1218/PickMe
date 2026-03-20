@@ -14,9 +14,10 @@ interface InterviewChatProps {
     initialQuestion: string;
     onFinish: (transcript: Message[]) => void;
     isPressureMode?: boolean;
+    targetCompany?: string;
 }
 
-export default function InterviewChat({ initialQuestion, onFinish, isPressureMode = false }: InterviewChatProps) {
+export default function InterviewChat({ initialQuestion, onFinish, isPressureMode = false, targetCompany = "" }: InterviewChatProps) {
     const [messages, setMessages] = useState<Message[]>([
         { role: 'assistant', content: initialQuestion }
     ]);
@@ -50,7 +51,10 @@ export default function InterviewChat({ initialQuestion, onFinish, isPressureMod
         setIsLoading(true);
 
         try {
-            const data = await chatWithInterviewer(newMessages, { is_pressure_mode: isPressureMode });
+            const data = await chatWithInterviewer(newMessages, { 
+                is_pressure_mode: isPressureMode,
+                target_company: targetCompany 
+            });
             const aiMessage: Message = {
                 role: 'assistant',
                 content: data.content

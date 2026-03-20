@@ -43,6 +43,10 @@ class JobApplication(BaseModel):
     company: str
     position: str
     deadline: str
+    written_exam_date: Optional[str] = None
+    first_interview_date: Optional[str] = None
+    second_interview_date: Optional[str] = None
+    category: Optional[str] = None
     notes: Optional[str] = None
 
 # CORS 설정
@@ -254,9 +258,12 @@ async def update_job_application(app_id: str, job: JobApplication):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/v1/jobs/sync-alio")
-async def sync_alio_jobs():
+async def sync_alio_jobs(category: Optional[str] = None):
     try:
-        jobs = await alio_service.fetch_active_jobs(count=20)
+        jobs = await alio_service.fetch_active_jobs(count=50) # Increase count for better filtering pool
+        if category and category != "전체":
+            jobs = [j for j in jobs if j.get("category") == category]
+            
         from database import db_manager
         
         added_count = 0

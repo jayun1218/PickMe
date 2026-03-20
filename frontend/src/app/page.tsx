@@ -24,6 +24,7 @@ export default function HomePage() {
     const [scrolled, setScrolled] = useState(false);
     const [mode, setMode] = useState<ViewMode>("simple"); // Using ViewMode type
     const [isPressureMode, setIsPressureMode] = useState(false);
+    const [targetCompany, setTargetCompany] = useState<string>("");
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -150,6 +151,7 @@ export default function HomePage() {
                                 initialQuestion={interviewQuestion}
                                 onFinish={finishInterview}
                                 isPressureMode={isPressureMode}
+                                targetCompany={targetCompany}
                             />
                         </div>
                     ) : !analysisResult ? (
@@ -269,18 +271,32 @@ export default function HomePage() {
                                     Upload different resume
                                 </button>
 
-                                {/* Pressure Mode Toggle */}
-                                <div className="flex items-center gap-4 bg-white/40 backdrop-blur-2xl p-2 pl-6 rounded-full border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] group">
-                                    <div className="flex flex-col">
-                                        <span className="text-[10px] font-black text-slate-900 uppercase tracking-tighter">Pressure Mode</span>
-                                        <span className="text-[9px] font-bold text-slate-400">심층 꼬리 질문 활성화</span>
+                                <div className="flex flex-wrap flex-col md:flex-row items-end md:items-center gap-4">
+                                    {/* Target Company Input */}
+                                    <div className="flex items-center gap-2 bg-white/40 backdrop-blur-2xl p-2 px-6 rounded-[20px] border border-white/60 shadow-sm">
+                                        <span className="text-[10px] font-black text-indigo-600 uppercase tracking-tighter pr-3 border-r border-indigo-100">Target</span>
+                                        <input 
+                                            type="text" 
+                                            placeholder="지원 기업명 (예: 한국전력공사)" 
+                                            value={targetCompany}
+                                            onChange={(e) => setTargetCompany(e.target.value)}
+                                            className="bg-transparent border-none outline-none text-[13px] font-bold text-slate-700 placeholder:text-slate-400 w-48 ml-1"
+                                        />
                                     </div>
-                                    <button
-                                        onClick={() => setIsPressureMode(!isPressureMode)}
-                                        className={`w-14 h-8 rounded-full p-1 transition-all duration-500 ${isPressureMode ? "bg-slate-900" : "bg-slate-200"}`}
-                                    >
-                                        <div className={`w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-500 ${isPressureMode ? "translate-x-6" : "translate-x-0"}`} />
-                                    </button>
+
+                                    {/* Pressure Mode Toggle */}
+                                    <div className="flex items-center gap-4 bg-white/40 backdrop-blur-2xl p-2 pl-6 rounded-[20px] border border-white/60 shadow-sm group">
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] font-black text-slate-900 uppercase tracking-tighter">Pressure Mode</span>
+                                            <span className="text-[9px] font-bold text-slate-400">심층 꼬리 질문 활성화</span>
+                                        </div>
+                                        <button
+                                            onClick={() => setIsPressureMode(!isPressureMode)}
+                                            className={`w-14 h-8 rounded-full p-1 transition-all duration-500 ${isPressureMode ? "bg-slate-900" : "bg-slate-200"}`}
+                                        >
+                                            <div className={`w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-500 ${isPressureMode ? "translate-x-6" : "translate-x-0"}`} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 

@@ -9,6 +9,10 @@ interface Job {
     company: string;
     position: string;
     deadline: string;
+    written_exam_date?: string | null;
+    first_interview_date?: string | null;
+    second_interview_date?: string | null;
+    category?: string | null;
     notes?: string;
 }
 
@@ -18,6 +22,7 @@ export default function JobCalendar() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isSyncing, setIsSyncing] = useState(false);
+    const [alioCategory, setAlioCategory] = useState("전체");
     const [editingJobId, setEditingJobId] = useState<string | null>(null);
 
     // New job form state
@@ -25,13 +30,16 @@ export default function JobCalendar() {
         company: '',
         position: '',
         deadline: '',
+        written_exam_date: '',
+        first_interview_date: '',
+        second_interview_date: '',
         notes: ''
     });
 
     const closeModal = () => {
         setIsModalOpen(false);
         setEditingJobId(null);
-        setNewJob({ company: '', position: '', deadline: '', notes: '' });
+        setNewJob({ company: '', position: '', deadline: '', written_exam_date: '', first_interview_date: '', second_interview_date: '', notes: '' });
     };
 
     useEffect(() => {
@@ -68,7 +76,7 @@ export default function JobCalendar() {
     const handleSyncAlio = async () => {
         setIsSyncing(true);
         try {
-            const result = await syncAlioJobs();
+            const result = await syncAlioJobs(alioCategory);
             alert(`동기화 완료! ${result.added}개의 새로운 공고가 추가되었습니다.`);
             fetchJobs();
         } catch (error) {
@@ -144,7 +152,20 @@ export default function JobCalendar() {
                     <button onClick={nextMonth} className="p-2 hover:bg-white rounded-xl transition-colors"><ChevronRight className="w-5 h-5 text-slate-600" /></button>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex gap-3 items-center">
+                    <select
+                        value={alioCategory}
+                        onChange={(e) => setAlioCategory(e.target.value)}
+                        className="bg-white/70 border border-transparent text-slate-800 text-[13px] rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold shadow-sm"
+                    >
+                        <option value="전체">전체 분야</option>
+                        <option value="에너지">에너지 (발전/전력)</option>
+                        <option value="SOC/건설/교통">SOC (건설/교통)</option>
+                        <option value="보건/복지">보건/복지/의료</option>
+                        <option value="금융">금융/경제</option>
+                        <option value="R&D/연구">R&D/연구</option>
+                        <option value="기타">기타</option>
+                    </select>
                     <button
                         onClick={handleSyncAlio}
                         disabled={isSyncing}
@@ -156,7 +177,7 @@ export default function JobCalendar() {
                     <button
                         onClick={() => {
                             setEditingJobId(null);
-                            setNewJob({ company: '', position: '', deadline: '', notes: '' });
+                            setNewJob({ company: '', position: '', deadline: '', written_exam_date: '', first_interview_date: '', second_interview_date: '', notes: '' });
                             setIsModalOpen(true);
                         }}
                         className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl font-bold text-[13px] hover:bg-slate-800 hover:scale-105 transition-all shadow-xl"
@@ -194,31 +215,44 @@ export default function JobCalendar() {
                                         <span className={`text-sm font-black mb-2 block ${index % 7 === 0 ? 'text-red-400' : index % 7 === 6 ? 'text-indigo-400' : 'text-slate-600'}`}>
                                             {day}
                                         </span>
-                                        <div className="space-y-1.5">
-                                            {dayJobs.map(job => (
-                                                <div
-                                                    key={job.id}
-                                                    onClick={() => {
-                                                        setEditingJobId(job.id);
-                                                        setNewJob({
-                                                            company: job.company,
-                                                            position: job.position,
-                                                            deadline: job.deadline,
-                                                            notes: job.notes || ''
-                                                        });
-                                                        setIsModalOpen(true);
-                                                    }}
-                                                    className="group/item relative px-2.5 py-1.5 bg-indigo-600 text-white text-[10px] rounded-lg font-bold shadow-md shadow-indigo-200 cursor-pointer hover:scale-105 transition-transform"
-                                                >
-                                                    <div className="truncate w-full">{job.company}</div>
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); handleDeleteJob(job.id); }}
-                                                        className="absolute -top-1 -right-1 w-4 h-4 bg-slate-900 rounded-full flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity"
+                                        <div className="space-y-1.5 pb-6">
+                                            {(() => {
+                                                const dateString = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                                                const eventsOnThisDate: {job: Job, type: string, color: string}[] = [];
+                                                jobs.forEach(job => {
+                                                    if (job.deadline === dateString) eventsOnThisDate.push({job, type: '서류', color: 'bg-indigo-500'});
+                                                    if (job.written_exam_date === dateString) eventsOnThisDate.push({job, type: '필기', color: 'bg-rose-500'});
+                                                    if (job.first_interview_date === dateString) eventsOnThisDate.push({job, type: '1차면접', color: 'bg-emerald-500'});
+                                                    if (job.second_interview_date === dateString) eventsOnThisDate.push({job, type: '2차면접', color: 'bg-teal-600'});
+                                                });
+                                                return eventsOnThisDate.map((event, idx) => (
+                                                    <div
+                                                        key={`${event.job.id}-${event.type}-${idx}`}
+                                                        onClick={() => {
+                                                            setEditingJobId(event.job.id);
+                                                            setNewJob({
+                                                                company: event.job.company,
+                                                                position: event.job.position,
+                                                                deadline: event.job.deadline,
+                                                                written_exam_date: event.job.written_exam_date || '',
+                                                                first_interview_date: event.job.first_interview_date || '',
+                                                                second_interview_date: event.job.second_interview_date || '',
+                                                                notes: event.job.notes || ''
+                                                            });
+                                                            setIsModalOpen(true);
+                                                        }}
+                                                        className={`group/item relative px-2.5 py-1.5 ${event.color} text-white text-[10px] rounded-lg font-bold shadow-md cursor-pointer hover:scale-[1.02] transition-transform`}
                                                     >
-                                                        <X className="w-2.5 h-2.5 text-white" />
-                                                    </button>
-                                                </div>
-                                            ))}
+                                                        <div className="truncate w-full tracking-tight">[{event.type}] {event.job.company}</div>
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); handleDeleteJob(event.job.id); }}
+                                                            className="absolute -top-1 -right-1 w-4 h-4 bg-slate-900 rounded-full flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity"
+                                                        >
+                                                            <X className="w-2.5 h-2.5 text-white" />
+                                                        </button>
+                                                    </div>
+                                                ));
+                                            })()}
                                         </div>
                                     </>
                                 )}
@@ -283,19 +317,25 @@ export default function JobCalendar() {
                                     </div>
                                 </div>
 
-                                <div className="space-y-4">
-                                    <label className="text-sm font-black text-slate-400 uppercase tracking-[0.4em] pl-2">마감 날짜</label>
-                                    <div className="relative group">
-                                        <div className="absolute left-10 top-1/2 -translate-y-1/2 text-indigo-400 group-focus-within:text-indigo-600 transition-all z-10 pointer-events-none">
-                                            <CalendarIcon className="w-8 h-8 group-focus-within:scale-125 transition-transform" />
+                                <div className="space-y-4 bg-slate-50/50 p-6 rounded-[40px] border-2 border-slate-100 pb-8">
+                                    <h4 className="text-lg font-black text-slate-800 mb-6 pl-2">일정 날짜 정보</h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] pl-2 block mb-2">서류 마감일 <span className="text-red-500">*</span></label>
+                                            <input type="date" required value={newJob.deadline} onChange={e => setNewJob({...newJob, deadline: e.target.value})} className="w-full px-6 py-4 bg-white border border-slate-200 rounded-3xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" />
                                         </div>
-                                        <input
-                                            required
-                                            type="date"
-                                            className="w-full pl-24 pr-10 py-8 bg-slate-50 border-2 border-slate-100 rounded-[35px] focus:ring-8 focus:ring-indigo-500/5 focus:border-indigo-500 outline-none text-xl font-bold text-slate-700 transition-all"
-                                            value={newJob.deadline}
-                                            onChange={(e) => setNewJob({ ...newJob, deadline: e.target.value })}
-                                        />
+                                        <div>
+                                            <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] pl-2 block mb-2">필기 시험일</label>
+                                            <input type="date" value={newJob.written_exam_date} onChange={e => setNewJob({...newJob, written_exam_date: e.target.value})} className="w-full px-6 py-4 bg-white border border-slate-200 rounded-3xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] pl-2 block mb-2">1차 면접일</label>
+                                            <input type="date" value={newJob.first_interview_date} onChange={e => setNewJob({...newJob, first_interview_date: e.target.value})} className="w-full px-6 py-4 bg-white border border-slate-200 rounded-3xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] pl-2 block mb-2">2차 면접일</label>
+                                            <input type="date" value={newJob.second_interview_date} onChange={e => setNewJob({...newJob, second_interview_date: e.target.value})} className="w-full px-6 py-4 bg-white border border-slate-200 rounded-3xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" />
+                                        </div>
                                     </div>
                                 </div>
 

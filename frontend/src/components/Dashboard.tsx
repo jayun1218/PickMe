@@ -15,7 +15,8 @@ export default function Dashboard() {
     const [history, setHistory] = useState<any[]>([]);
     const [jobs, setJobs] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [dDayInfo, setDDayInfo] = useState<{ days: number, company: string } | null>(null);
+    const [dDayInfo, setDDayInfo] = useState<{ days: string | number, company: string } | null>(null);
+    const [urgentAlerts, setUrgentAlerts] = useState<{ company: string; type: string; diffDays: number }[]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -27,21 +28,48 @@ export default function Dashboard() {
                 setHistory(historyData);
                 setJobs(jobsData);
 
-                // D-Day 계산
+                // D-1, D-Day 긴급 알림 계산
                 if (jobsData && jobsData.length > 0) {
+                    const todayStr = new Date();
+                    todayStr.setHours(0, 0, 0, 0);
+
+                    const alerts: { company: string; type: string; diffDays: number }[] = [];
+
+                    jobsData.forEach((job: any) => {
+                        const checkDate = (dateStr: string | undefined | null, typeName: string) => {
+                            if (!dateStr) return;
+                            const targetDate = new Date(dateStr);
+                            targetDate.setHours(0, 0, 0, 0);
+                            const diffTime = targetDate.getTime() - todayStr.getTime();
+                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                            
+                            if (diffDays === 1 || diffDays === 0) {
+                                alerts.push({ company: job.company, type: typeName, diffDays });
+                            }
+                        };
+
+                        checkDate(job.deadline, '서류 제출');
+                        checkDate(job.written_exam_date, 'NCS/필기 시험');
+                        checkDate(job.first_interview_date, '1차 면접');
+                        checkDate(job.second_interview_date, '최종 면접');
+                    });
+                    
+                    setUrgentAlerts(alerts);
+
+                    // 메인 D-Day 계산
                     const now = new Date();
                     const futureJobs = jobsData
                         .map((job: any) => ({
                             ...job,
                             diff: new Date(job.deadline).getTime() - now.getTime()
                         }))
-                        .filter((job: any) => job.diff > 0)
+                        .filter((job: any) => job.diff >= -86400000) // Include today
                         .sort((a: any, b: any) => a.diff - b.diff);
 
                     if (futureJobs.length > 0) {
                         const closest = futureJobs[0];
-                        const days = Math.ceil(closest.diff / (1000 * 60 * 60 * 24));
-                        setDDayInfo({ days, company: closest.company });
+                        const days = Math.floor(closest.diff / (1000 * 60 * 60 * 24));
+                        setDDayInfo({ days: days === 0 ? 'DAY' : days.toString(), company: closest.company });
                     }
                 }
             } catch (error) {
@@ -118,6 +146,29 @@ export default function Dashboard() {
 
     return (
         <div className="space-y-16 lg:space-y-20 animate-in fade-in slide-in-from-bottom-12 duration-1000 w-full max-w-6xl">
+            {urgentAlerts.length > 0 && (
+                <div className="flex flex-col gap-4 animate-in slide-in-from-top-4 duration-500 w-full -mb-8">
+                    {urgentAlerts.map((alert, idx) => (
+                        <div key={idx} className="bg-red-500/10 border-2 border-red-500/50 rounded-3xl p-6 flex flex-col md:flex-row text-red-600 shadow-xl shadow-red-500/10 items-center justify-between gap-4">
+                            <div className="flex items-center gap-5 w-full">
+                                <div className="bg-red-500 text-white p-3 rounded-2xl animate-pulse shrink-0 shadow-lg shadow-red-500/30">
+                                    <AlertCircle className="w-8 h-8" />
+                                </div>
+                                <div className="flex-1 text-left">
+                                    <h3 className="text-xl md:text-2xl font-[1000] tracking-tight text-red-600 mb-1">
+                                        🚨 {alert.diffDays === 0 ? '오늘' : '내일'} 마감 긴급 알림!
+                                    </h3>
+                                    <p className="font-bold text-red-500/80 text-sm md:text-base leading-snug">
+                                        <strong className="text-red-600 bg-red-100 px-2 py-0.5 rounded-md mr-1">{alert.company}</strong>의 
+                                        <strong className="text-red-500 mx-1">{alert.type}</strong> 일정이 코앞으로 다가왔습니다. 늦지 않게 확인하세요!
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
             {/* Mental Care & D-Day Banner */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
                 <div className="lg:col-span-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-[40px] p-12 lg:p-16 text-white shadow-2xl shadow-indigo-200 relative overflow-hidden group">
