@@ -80,6 +80,17 @@ class DatabaseManager:
             print(f"공고 저장 중 오류 발생: {e}")
             return None
 
+    async def check_job_exists(self, company: str, position: str) -> bool:
+        """해당 회사와 직무의 공고가 이미 존재하는지 확인합니다."""
+        if not self.client:
+            return False
+        try:
+            res = self.client.table("job_applications").select("id").eq("company", company).eq("position", position).execute()
+            return len(res.data) > 0
+        except Exception as e:
+            print(f"중복 조회 중 오류 발생: {e}")
+            return False
+
     async def get_job_applications(self):
         """등록된すべての 지원 공고 정보를 가져옵니다."""
         if not self.client:

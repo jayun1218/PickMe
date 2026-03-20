@@ -10,6 +10,7 @@ from services.interview_service import InterviewService
 from services.feedback_service import FeedbackService
 from services.stt_service import STTService
 from services.scraping_service import ScrapingService
+from services.alio_service import AlioService
 
 load_dotenv()
 
@@ -19,6 +20,7 @@ interview_service = InterviewService()
 feedback_service = FeedbackService()
 stt_service = STTService()
 scraping_service = ScrapingService()
+alio_service = AlioService()
 
 # API 데이터 모델
 class ChatMessage(BaseModel):
@@ -248,6 +250,24 @@ async def update_job_application(app_id: str, job: JobApplication):
         if not result:
             raise HTTPException(status_code=500, detail="수정에 실패했습니다.")
         return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/v1/jobs/sync-alio")
+async def sync_alio_jobs():
+    try:
+        jobs = await alio_service.fetch_active_jobs(count=20)
+        from database import db_manager
+        
+        added_count = 0
+        for job in jobs:
+            exists = await db_manager.check_job_exists(job["company"], job["position"])
+            if not exists:
+                res = await db_manager.save_job_application(job)
+                if res:
+                    added_count += 1
+                
+        return {"status": "success", "fetched": len(jobs), "added": added_count}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

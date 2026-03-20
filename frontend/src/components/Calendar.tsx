@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, X, Briefcase, Building2, Bell } from 'lucide-react';
-import { getJobs, addJob, deleteJob, updateJob } from '@/lib/api';
+import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, X, Briefcase, Building2, Bell, Loader2, Sparkles } from 'lucide-react';
+import { getJobs, addJob, deleteJob, updateJob, syncAlioJobs } from '@/lib/api';
 
 interface Job {
     id: string;
@@ -17,6 +17,7 @@ export default function JobCalendar() {
     const [jobs, setJobs] = useState<Job[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [isSyncing, setIsSyncing] = useState(false);
     const [editingJobId, setEditingJobId] = useState<string | null>(null);
 
     // New job form state
@@ -61,6 +62,20 @@ export default function JobCalendar() {
         } catch (error) {
             console.error("Failed to save job:", error);
             alert("저장에 실패했습니다.");
+        }
+    };
+
+    const handleSyncAlio = async () => {
+        setIsSyncing(true);
+        try {
+            const result = await syncAlioJobs();
+            alert(`동기화 완료! ${result.added}개의 새로운 공고가 추가되었습니다.`);
+            fetchJobs();
+        } catch (error) {
+            console.error("Failed to sync ALIO jobs:", error);
+            alert("공공데이터 동기화에 실패했습니다. (API 키 승인 대기 중일 수 있습니다.)");
+        } finally {
+            setIsSyncing(false);
         }
     };
 
@@ -129,16 +144,26 @@ export default function JobCalendar() {
                     <button onClick={nextMonth} className="p-2 hover:bg-white rounded-xl transition-colors"><ChevronRight className="w-5 h-5 text-slate-600" /></button>
                 </div>
 
-                <button
-                    onClick={() => {
-                        setEditingJobId(null);
-                        setNewJob({ company: '', position: '', deadline: '', notes: '' });
-                        setIsModalOpen(true);
-                    }}
-                    className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl font-bold text-sm hover:bg-slate-800 hover:scale-105 transition-all shadow-xl"
-                >
-                    <Plus className="w-4 h-4" /> 일정 추가하기
-                </button>
+                <div className="flex gap-3">
+                    <button
+                        onClick={handleSyncAlio}
+                        disabled={isSyncing}
+                        className="flex items-center gap-2 px-6 py-3 bg-indigo-500 text-white rounded-2xl font-bold text-[13px] hover:bg-indigo-600 hover:scale-105 transition-all shadow-xl disabled:opacity-50 disabled:hover:scale-100"
+                    >
+                        {isSyncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                        잡알리오 동기화
+                    </button>
+                    <button
+                        onClick={() => {
+                            setEditingJobId(null);
+                            setNewJob({ company: '', position: '', deadline: '', notes: '' });
+                            setIsModalOpen(true);
+                        }}
+                        className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl font-bold text-[13px] hover:bg-slate-800 hover:scale-105 transition-all shadow-xl"
+                    >
+                        <Plus className="w-4 h-4" /> 일정 추가
+                    </button>
+                </div>
             </div>
 
             {/* Calendar Grid */}

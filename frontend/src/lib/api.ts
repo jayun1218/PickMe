@@ -105,3 +105,8 @@ export const updateJob = async (appId: string, jobData: { company: string; posit
     const response = await api.put(`/api/v1/jobs/${appId}`, jobData);
     return response.data;
 };
+
+export const syncAlioJobs = async () => {
+    const response = await api.post('/api/v1/jobs/sync-alio');
+    return response.data;
+};
