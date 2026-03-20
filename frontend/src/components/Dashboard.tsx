@@ -431,15 +431,18 @@ export default function Dashboard() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                         {jobs.filter(j => j.category !== "기타" || j.notes?.includes("ALIO")).slice(0, 6).map((job, idx) => (
-                            <div key={idx} className="bg-white/60 backdrop-blur-3xl border border-white/80 rounded-3xl p-8 hover:shadow-2xl hover:shadow-indigo-100/50 hover:-translate-y-2 transition-all duration-500 group relative overflow-hidden flex flex-col justify-between h-full">
+                            <div key={idx} className="bg-white/60 backdrop-blur-3xl border border-white/80 rounded-xl p-8 hover:shadow-2xl hover:shadow-indigo-100/50 hover:-translate-y-2 transition-all duration-500 group relative overflow-hidden flex flex-col justify-between h-full">
                                 <div className="space-y-6">
-                                    <div className="flex items-center justify-between">
+                                    <div className="flex items-center justify-between gap-3">
                                         <span className="px-4 py-1.5 bg-indigo-50 text-indigo-600 text-[10px] font-black rounded-lg uppercase tracking-tighter border border-indigo-100/50">
                                             {job.category || "공기업"}
                                         </span>
-                                        <div className="flex items-center gap-2 text-red-500 font-black text-[11px] bg-red-50/50 px-3 py-1 rounded-full border border-red-100/50">
-                                            <Clock className="w-3 h-3" />
-                                            D-{Math.ceil((new Date(job.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))}
+                                        <div className="flex items-center gap-2 text-white font-black text-[12px] bg-red-600 px-3 py-1.5 rounded-lg shadow-lg shadow-red-200/50 flex-shrink-0 whitespace-nowrap">
+                                            <Clock className="w-3.5 h-3.5" />
+                                            {(() => {
+                                                const diff = Math.ceil((new Date(job.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+                                                return diff === 0 ? "D-Day" : `D-${Math.abs(diff)}`;
+                                            })()}
                                         </div>
                                     </div>
                                     <div className="space-y-3">

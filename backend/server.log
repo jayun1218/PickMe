@@ -32,3 +32,15 @@ ALIO response status: 200
 공고 저장 중 오류 발생: {'message': "Could not find the 'url' column of 'job_applications' in the schema cache", 'code': 'PGRST204', 'hint': None, 'details': None}
 공고 저장 중 오류 발생: {'message': "Could not find the 'url' column of 'job_applications' in the schema cache", 'code': 'PGRST204', 'hint': None, 'details': None}
 INFO:     127.0.0.1:50763 - "POST /api/v1/jobs/sync-alio HTTP/1.1" 200 OK
+이력서 조회 중 오류 발생: {'message': "Could not find the table 'public.user_resumes' in the schema cache", 'code': 'PGRST205', 'hint': "Perhaps you meant the table 'public.interview_results'", 'details': None}
+INFO:     127.0.0.1:50807 - "GET /api/v1/resumes/test-user HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50807 - "GET /api/v1/interview/history?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50810 - "GET /api/v1/jobs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50807 - "GET /api/v1/interview/history?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50810 - "GET /api/v1/jobs HTTP/1.1" 200 OK
+이력서 조회 중 오류 발생: {'message': "Could not find the table 'public.user_resumes' in the schema cache", 'code': 'PGRST205', 'hint': "Perhaps you meant the table 'public.interview_results'", 'details': None}
+INFO:     127.0.0.1:50823 - "GET /api/v1/resumes/test-user HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50823 - "GET /api/v1/interview/history?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50826 - "GET /api/v1/jobs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50823 - "GET /api/v1/interview/history?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50826 - "GET /api/v1/jobs HTTP/1.1" 200 OK
