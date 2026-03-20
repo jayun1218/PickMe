@@ -68,8 +68,16 @@ export default function Dashboard() {
 
                     if (futureJobs.length > 0) {
                         const closest = futureJobs[0];
-                        const days = Math.floor(closest.diff / (1000 * 60 * 60 * 24));
-                        setDDayInfo({ days: days === 0 ? 'DAY' : days.toString(), company: closest.company });
+                        const days = Math.ceil(closest.diff / (1000 * 60 * 60 * 24));
+                        let displayDays = '';
+                        if (days < 0) {
+                            displayDays = `+${Math.abs(days)}`;
+                        } else if (days === 0) {
+                            displayDays = '-DAY';
+                        } else {
+                            displayDays = `-${days}`;
+                        }
+                        setDDayInfo({ days: displayDays, company: closest.company });
                     }
                 }
             } catch (error) {
@@ -145,9 +153,9 @@ export default function Dashboard() {
     const isEmpty = history.length === 0;
 
     return (
-        <div className="space-y-16 lg:space-y-20 animate-in fade-in slide-in-from-bottom-12 duration-1000 w-full max-w-6xl">
+        <div className="flex flex-col gap-4 md:gap-6 lg:gap-8 animate-in fade-in slide-in-from-bottom-12 duration-1000 w-full max-w-6xl py-10">
             {urgentAlerts.length > 0 && (
-                <div className="flex flex-col gap-4 animate-in slide-in-from-top-4 duration-500 w-full -mb-8">
+                <div className="flex flex-col gap-4 animate-in slide-in-from-top-4 duration-500 w-full">
                     {urgentAlerts.map((alert, idx) => (
                         <div key={idx} className="bg-red-500/10 border-2 border-red-500/50 rounded-3xl p-6 flex flex-col md:flex-row text-red-600 shadow-xl shadow-red-500/10 items-center justify-between gap-4">
                             <div className="flex items-center gap-5 w-full">
@@ -171,33 +179,33 @@ export default function Dashboard() {
 
             {/* Mental Care & D-Day Banner */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-                <div className="lg:col-span-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-[40px] p-12 lg:p-16 text-white shadow-2xl shadow-indigo-200 relative overflow-hidden group">
+                <div className="lg:col-span-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-[40px] px-12 py-16 lg:px-16 lg:py-24 text-white shadow-2xl shadow-indigo-200 relative overflow-hidden group min-h-[400px] flex items-center justify-center">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl group-hover:scale-110 transition-transform duration-1000"></div>
-                    <div className="relative z-10 flex flex-col items-center justify-center gap-8 lg:gap-10 h-full w-full">
-                        <div className="space-y-4 text-center max-w-md mx-auto flex flex-col items-center">
-                            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-white/20 rounded-full text-[9px] font-[900] uppercase tracking-wider backdrop-blur-md">
-                                <Heart className="w-3 h-3 fill-white" /> AI Daily Support
+                    <div className="relative z-10 flex flex-col items-center justify-center gap-12 lg:gap-16 h-full w-full py-6">
+                        <div className="space-y-6 text-center max-w-lg mx-auto flex flex-col items-center">
+                            <div className="inline-flex items-center gap-1.5 px-5 py-2 bg-white/20 rounded-full text-[10px] font-[900] uppercase tracking-wider backdrop-blur-md">
+                                <Heart className="w-3.5 h-3.5 fill-white" /> AI Daily Support
                             </div>
-                            <h2 className="text-[22px] md:text-3xl font-[900] leading-snug tracking-tight">
+                            <h2 className="text-3xl md:text-4xl font-[900] leading-snug tracking-tight">
                                 "지치지 마세요. 당신의 <br />
                                 가능성은 데이터가 증명합니다."
                             </h2>
-                            <p className="text-[13px] text-indigo-50 font-[700] opacity-90 leading-relaxed mt-2 px-4">
+                            <p className="text-[15px] text-indigo-50 font-[700] opacity-90 leading-relaxed mt-4 px-6 md:px-10">
                                 오늘의 조언: 답변 시 '결과' 보다는 '과정에서의 문제 해결 방식'을 더 강조해 보세요. 훨씬 매력적으로 들릴 거예요!
                             </p>
                         </div>
                         {dDayInfo ? (
-                            <div className="flex flex-col items-center justify-center bg-white/10 backdrop-blur-xl rounded-[24px] px-8 py-5 border border-white/20 shrink-0 shadow-lg">
-                                <span className="text-[10px] font-[900] uppercase tracking-[0.1em] opacity-80 mb-1 text-indigo-100">D-DAY</span>
-                                <span className="text-4xl md:text-[44px] font-[900] tracking-tighter mb-2 text-white">D-{dDayInfo.days}</span>
-                                <span className="text-[10px] font-[900] bg-white text-indigo-600 px-3 py-1 rounded-[8px] shadow-sm tracking-wide">
+                            <div className="flex flex-col items-center justify-center bg-white/10 backdrop-blur-xl rounded-[36px] px-16 py-10 border border-white/20 shrink-0 shadow-lg min-w-[240px]">
+                                <span className="text-sm font-[900] uppercase tracking-[0.2em] opacity-80 mb-3 text-indigo-100">D-DAY</span>
+                                <span className="text-6xl md:text-7xl font-[900] tracking-tighter mb-5 text-white">D{dDayInfo.days}</span>
+                                <span className="text-sm font-[900] bg-white text-indigo-600 px-5 py-2 rounded-xl shadow-sm tracking-wide">
                                     {dDayInfo.company}
                                 </span>
                             </div>
                         ) : (
-                            <div className="flex flex-col items-center justify-center bg-white/10 backdrop-blur-xl rounded-[24px] px-8 py-5 border border-white/20 shrink-0 shadow-sm opacity-90">
-                                <AlertCircle className="w-6 h-6 mb-2 opacity-50 text-white" />
-                                <span className="text-center text-[11px] font-[800] opacity-80 text-white leading-relaxed">
+                            <div className="flex flex-col items-center justify-center bg-white/10 backdrop-blur-xl rounded-[36px] px-16 py-10 border border-white/20 shrink-0 shadow-sm opacity-90 min-w-[240px]">
+                                <AlertCircle className="w-8 h-8 mb-3 opacity-50 text-white" />
+                                <span className="text-center text-xs font-[800] opacity-80 text-white leading-relaxed">
                                     등록된 일정이 <br /> 없습니다
                                 </span>
                             </div>
@@ -230,7 +238,7 @@ export default function Dashboard() {
             </div>
 
             {/* Middle Section: Stats & Competency Chart */}
-            <div className="flex flex-col lg:flex-row gap-10 lg:gap-14">
+            <div className="flex flex-col lg:flex-row gap-10 lg:gap-14 w-full">
                 {/* Stats Overview */}
                 <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-8 order-2 lg:order-1">
                     <StatCard
